@@ -1,0 +1,156 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          aceptd
+# Required-Start:    
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: Start acept, Demonio contro parental.
+### END INIT INFO
+#
+# skeleton	example file to build /etc/init.d/ scripts.
+#		This file should be used to construct scripts for /etc/init.d.
+#
+#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#		Modified for Debian 
+#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#
+# Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
+
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/mefistofelina
+NAME=aceptd
+DESC="Demonio Acept"
+
+test -x $DAEMON || exit 0
+
+set -e
+
+case "$1" in
+  start)
+	echo -n " Iniciando $DESC: "
+	proc=`ps -e | grep mefistofelina | awk '{print $1}' | head -n 1 `
+	if [ ! -z $proc ]; then
+		echo " $NAME ya esta ejecutandose"
+		if [ -e /var/run/$NAME.pid ]; then
+			pid=`cat /var/run/$NAME.pid`
+			if [ $proc != $pid ];then 
+				rm /var/run/$NAME.pid
+				echo $proc > /var/run/$NAME.pid
+			fi
+		else
+			echo $proc > /var/run/$NAME.pid
+		fi
+	else
+		$DAEMON &
+	fi
+	echo  "  $NAME."
+	;;
+  stop)
+	echo -n "Deteniendo $DESC: "
+	proc=`ps -e | grep mefistofelina | awk '{print $1}' | head -n 1 `
+	sq=`ps -e | grep squid | awk '{print $1}' | head -n 1 `
+	if [ -z $sq ]; then
+		t=6
+	else
+		t=20
+	fi
+	if [ -z $proc ];then
+		if [ ! -e /var/run/$NAME.pid ]; then
+			echo " $NAME no se encuentra lanzado"
+		else
+			pid=`cat /var/run/$NAME.pid`
+			proc2=`ps -e | grep $pid | awk '{print $1}' | head -n 1 `
+			if [ -z $proc2 ]; then
+				echo " $NAME no se encuentra lanzado"
+				rm /var/run/$NAME.pid
+			else
+				kill -15 $proc2
+			fi
+		fi
+	else	
+		if [ ! -e /var/run/$NAME.pid ]; then
+			echo $proc > /var/run/$NAME.pid
+		fi
+		kill -15 $proc
+	fi
+	echo  "  $NAME."
+	;;
+  reload|force-reload)
+	echo -n "Releyendo configuracion de $DESC:"
+	proc=`ps -e | grep mefistofelina | awk '{print $1}' | head -n 1 `
+	if [ -z $proc ]; then
+		echo " $NAME no se encuentra lanzado"
+  		if [ -e /var/run/$NAME.pid ]; then
+			rm /var/run/$NAME.pid
+		fi
+	else
+		if [ -e /var/run/$NAME.pid ]; then
+			pid=`cat /var/run/$NAME.pid`
+			if [ $proc != $pid ];then
+				rm /var/run/$NAME.pid
+				echo $proc > /var/run/$NAME.pid
+			fi	
+		fi
+		kill -18 $proc 
+	fi
+	echo  "  $NAME."
+	;;
+  restart)
+	echo  "Reiniciando $DESC: "
+	echo -n " Deteniendo $DESC: "
+	proc=`ps -e | grep mefistofelina | awk '{print $1}' | head -n 1 `
+	sq=`ps -e | grep squid | awk '{print $1}' | head -n 1 `
+	if [ -z $sq ]; then
+		t=8
+	else
+		t=20
+	fi
+	if [ -z $proc ];then
+		if [ ! -e /var/run/$NAME.pid ]; then
+			echo " $NAME no se encuentra lanzado"
+		else
+			pid=`cat /var/run/$NAME.pid`
+			proc2=`ps -e | grep $pid | awk '{print $1}' | head -n 1 `
+			if [ -z $proc2 ]; then
+				echo " $NAME no se encuentra lanzado"
+				rm /var/run/$NAME.pid
+			else
+				kill -15 $proc2
+			fi
+		fi
+	else	
+		if [ ! -e /var/run/$NAME.pid ]; then
+			echo $proc > /var/run/$NAME.pid
+		fi
+		kill -15 $proc
+	fi
+	echo  "  $NAME."
+	echo -n " Iniciando $DESC: "
+	proc=`ps -e | grep mefistofelina | awk '{print $1}' | head -n 1 `
+	if [ ! -z $proc ]; then
+		echo " $NAME ya esta ejecutandose"
+		if [ -e /var/run/$NAME.pid ]; then
+			pid=`cat /var/run/$NAME.pid`
+			if [ $proc != $pid ];then 
+				rm /var/run/$NAME.pid
+				echo $proc > /var/run/$NAME.pid
+			fi
+		else
+			echo $proc > /var/run/$NAME.pid
+		fi
+	else
+		$DAEMON &
+	fi
+	echo  "  $NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

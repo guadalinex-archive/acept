@@ -1,0 +1,879 @@
+
+
+
+MANUAL DE DESARROLLADORES
+
+
+INDICE
+
+1.Proyecto ACEPT...........................................................3
+2.Entorno de programacion .................................................3
+3.Estructura de directorios y archivos de configuracion....................4
+4.Componentes de la aplicacion.............................................6
+  A)Aplicacion grofica .................................................6
+    i.Asistente de configuracion...................................7
+    ii.Aplicacion de configuracion avanzada........................7
+    iii.Ayuda......................................................10
+  B)Demonio de la aplicacion............................................11
+    i.Control de acceso............................................11
+    ii.Cuotas de uso...............................................11
+    iii.Filtrado de contenido......................................11
+    iv.Registro uso de aplicaciones................................12
+   C)Parametros de Acept .................. ............................13
+5.Especificacion de las funciones de ACEPT.................................13
+6.Internacionalizacion ....................................................35
+   A)El entorno grafico.................................................35
+   B)La ayuda...........................................................36
+
+
+
+1.Proyecto ACEPT
+
+El objetivo del proyecto ACEPT es el de poner a disposicion del padre, madre o tutor, una serie de herramientas sobre Guadalinex, con las que pueda delimitar y controlar el uso que hacen sus hijos del ordenador, en particular de Internet. 
+
+ACEPT es una aplicacion que ofrece un entorno amigable con el que es posible aplicar politicas de restriccion de acceso al ordenador para los usuarios, limitar el uso de servicios concretos y filtrar el acceso a Internet que hacen los usuarios, a traves del proxy squid y del plugin squidguard, todo ello de una manera sencilla y con una instalacion automatizada.
+
+
+2.Lenguaje y entorno de programacion
+
+ACEPT ha sido desarrollado en su totalidad haciendo uso del lenguaje de programacion Python. Python es un lenguaje de programacion interpretado, interactivo, orientado a objetos y extensible.
+
+Las herramientas de las que se ha hecho uso para el desarrollo de ACEPT han sido:
+
+vim: editor de texto utilizado en Linux y otros sistemas tipo UNIX. Escrito por Bram Molenaar, cuyas siglas responden a Vi mejorado (vi improved)
+
+eric3: Python IDE. (Integrated Development Enviroment ) Entorno de desarrollo integrado completo para Python, escrito en PyQt.
+
+wxGlade: diseñador de GUIs (Graphical User Interfaces - Interfaces graficas de usuario), escrita en Python con el popular kit de herramientas GUI: wxPython que ayuda a crear interfaces graficas de usuario wxWidgets y wxPython, que permite generar codigo Python, C++, Perl y XRC.
+
+
+
+
+3.Estructura de directorios y archivos de configuracion
+
+El arbol de directorios de ACEPT en el sistema, en su instalacion por defecto, es el siguiente:
+
+		        "/"
+	  _______________________|________________________________
+	  |	     |	              |                          |
+	/etc   	   /opt              /usr                      /var
+	  |          |        ________|__________          ______|______
+	  |          |        |       |         |          |           |
+     /acept/watcherCat  /caton  /squid /squiGuard /Berkeley   /lib          /www
+	  |	     |	     				   |	       |
+	/lang	  /acept			     /squidguard  /squid-reports
+	  ___________|_______________
+	  |          |              |
+    /documentos  /estadisticas  /pixmaps
+
+			Figura 1. Estructura de directorios de ACEPT en el sistema
+
+	/etc/acept/watcherCat: directorio donde se almacenan los archivos de configuracion de la aplicacion, entre ellos archivo de configuracion general xml de acept (watcherconf.xml), configuracion de iptables que se aplican al sistema y algunos otros auxiliares.
+
+	/etc/acept/watcherCat/lang: directorio en el que se encuentran los subdirectorios de las locales del programa, es es_ES, etc. Dentro de estos a su vez tenemos el subdirectorio LC_MESSAGES que es donde se hallan los archivos .mo.1
+
+	/opt/caton/acept: link que apunta al directorio con el sufijo de la version actual (1.2) donde se ubica el codigo de la aplicacion ACEPT, ademas aquí se encuentra el directorio que contiene la documentación del proyecto (documentos), con los manuales de usuario y desarrolladores, archivos de README, Changelog, Bugtracking y Wishlist, directorio donde se almacenan datos de uso de aplicaciones (estadisticas), directorio contiene iconos graficos de la aplicacion (pixmaps).
+
+	/usr/squid: directorio donde se instala squid. Aquí se encuentra la totalidad de su codigo, con los directorios que contienen los archivos de configuracion, ejecutables, etc...
+
+	/usr/squidGuard: directorio de instalacion del plugin de squid: squidGuard.
+
+	/usr/BerkeleyDB: directorio donde se instala la libreria BerkelyDB necesitada por squidGuard (libdb-4.4.0).
+
+	/var/lib/squidguard/db: ubicacion de la base de datos de dominios y urls con la que trabaja squidGuard para filtrado de contenidos en el acceso de los usuarios a Internet.
+
+El principal archivo de configuracion con el que trabaja ACEPT watcherconf.xml, se encuentra en "/etc/acept/watcherCat", este archivo se presenta en formato XML, en él se recogen todos los aspectos contemplados en la aplicacion para el control del sistema, como ubicacion y opciones del software instalado (squid, squidguard, sarg), ultima fecha de lanzamiento de la aplicacion ACEPT en el sistema, servicios considerados para ser controlados y su definicion, usuarios definidos y acceso que se les permite, fuentes desde las que se obtienen las blacklists con las que trabaja el sistema y categorías o grupos de listas locales presentes en el sistema, que pueden ser filtrados a los usuarios.
+Existen otros archivos de configuracion auxiliares, ubicados tambien en /etc/acept/watcherCat:
+
+	asocia_contenidos: archivo de texto plano en el que se establece correspondencia entre categorías de blacklists y contenidos generales para facilitar la configuracion a traves del asistente.
+	
+	limpia_iptables: archivo de texto plano  empleado para limpiar del sistema las reglas de iptables cargadas.
+	
+	reglas.iptables: archivo de texto donde mefistofelina escribe las iptables que van a ser cargadas en el sistema.
+
+4.Componentes de la aplicacion
+
+ACEPT esta integrada por dos componentes principales, la aplicacion grafica, a traves de la que se establece la configuracion del sistema y se consulta el uso que los usuarios han hecho del equipo y el demonio de ACEPT, 'mefistofelina', encargado de aplicar dicha configuracion en el sistema y recopilar los datos de uso del ordenador. En el primer apartado se describe en detalle la aplicacion grafica, en el segundo cómo el demonio lleva a cabo las cuatro tareas principales que tiene encomendadas:  control de acceso, cuotas de uso, filtrado de contenidos y registro de uso de aplicaciones.
+
+A)Aplicacion grafica
+
+	La interfaz grafica de ACEPT esta formada por tres elementos, estos son el Asistente de configuracion, la aplicacion de configuracion Avanzada y la Ayuda en línea. 
+
+			
+  i.Asistente de configuracion
+
+Se trata de una interfaz creada con la libreria wx de python que guía al usuario administrador paso a paso en la configuracion tipica de un usuario. Para ello asume ciertos parametros, como que si se restringe el uso de Internet, si se restringen todos los servicios por igual o si los usuarios a configurar son los que se encuentran a partir del uid 1001, no incluye el usuario de uid 1000 ya que es el propio administrador del sistema.
+
+Antes de escribir los cambios presenta un resumen de la configuracion que se ha elegido para el usuario, de modo que el administrador pueda aceptar o no las modificaciones. La configuracion seleccionada sobreescribe por completo cualquier configuracion anterior existente para ese usuario, eliminando los consumos anteriores que pudiera tener el usuario.
+
+Se accede a ella a traves de la ventana principal de la aplicacion  pulsando en el boton "Asistente".
+
+  ii.Aplicacion de configuracion avanzada
+
+En ella podremos consultar y configurar todos los parametros que hemos creado mediante el asistente de configuracion, así como otros que por su carácter mas complejo se han dejado fuera de éste.
+
+Desde la ventana principal de la aplicacion pulsamos en "configuracion avanzada" para acceder a esta interfaz. A diferencia del asistente no se trata de un entorno lineal, sino que  puede accederse directamente al apartado que se desee. Los apartados son los siguientes:
+
+1.Aplicacion
+  1.Salir
+2.Usuarios
+  1.Horarios
+  2.Contenidos
+3.Configurar
+  1.Servicios
+  2.Listas
+4.Estadisticas
+  1.Uso web
+  2.Servicios
+5.Ayuda
+  1.Sobre Acept
+
+1. Aplicacion
+
+1.1 -> Salir
+Cierra la aplicacion, pero antes de ello realiza una serie de tareas, fuerza a mostrar a la ventana principal de acept que permanecía oculta y se cierra a si mismo.
+
+2.  Usuarios
+En esta sección se agrupan los apartados que tienen que ver con el control de los usuarios.
+
+2.1 -> Horarios
+Aquí  tenemos una serie de tablas en las que se muestran los servicios con diversos datos, tiempo consumido, prorrogas, limites en los servicios y tiempo en el  que se permite usar el PC. Todo esto se aplica al usuario seleccionado en la casilla de la izquierda a partir de la uid señalada justo debajo.
+Al pulsar la casilla "aceptar" se graban los cambios en el archivo de configuracion teniendo en cuenta los consumos que ya pudiesen existir.
+
+2.2 -> Contenidos
+Se muestran los usuarios a partir de la uid que se ha seleccionado en "horarios". Por defecto la 1001, las listas negras y blancas de un usuario se muestran tras seleccionarlo en el recuadro de la izquierda, apareciendo estas en la parte derecha de la ventana. Tras modificarlas se llama a una serie de funciones que actualizan los datos del archivo de configuracion de la aplicacion y  los archivos que configuran las diversas instancias de squid.
+
+3.  Configurar
+En esta sección podremos modificar los parametros que atañen a la descripción de los servicios y a las listas definidas por squid, así como a sus fuentes.
+
+3.1 -> Servicios
+Presenta dos pestañas que se muestran u ocultan alternativamente segun el boton que se pulse, apareciendo inicialmente la de "nuevo servicio". La única diferencia de la pestaña "nuevo servicio" con "modificar servicio", es que en lugar de aparecer los servicios ya existentes en el archivo de configuracion, te muestra una casilla en blanco que acepta una cadena alfanumérica, siempre que no coincida con el nombre de un servicio ya existente ni con alguna de las palabras reservadas para la configuracion de la aplicacion (config, squid, servicios, usuarios, blacklists, group, source, activo, total_diario, total_semanal, total_mensual).
+
+Cuando se pulsa en "aceptar" sólo se guardan los cambios de la pestaña que se muestra en ese momento.
+
+3.2 -> Listas
+En este apartado podemos seleccionar desde que fuentes (uris) se descargan mediante la libreria urllib, las listas negras y ademas crear listas negras locales. Una vez aceptemos se grabarán los cambios en el archivo de configuracion.
+
+4. Estadisticas
+En este apartado se muestran las diversas opciones de las que se dispone para recoger los datos de las actividades de los usuarios.
+
+4.1 -> Uso web
+Los datos se obtienen de las estadisticas que genera el propio squid, usando la aplicacion sarg.
+
+4.2 -> Servicios
+Los datos se extraen aquí del propio demonio, que al cambiar las semanas  y meses hace una recopilación del uso que se da de ellos distintos servicios por usuario.
+
+5. Ayuda
+Aquí tan sólo tenemos una entrada "Sobre Acept" que muestra un mensaje informativo sobre los autores del programa.
+
+  iii.Ayuda
+
+Se accede a esta tras pulsar el boton "ayuda" en la ventana principal de Acept. Cuenta con dos apartados diferenciados, a la izquierda un listbox que hace las funciones de indice y a la derecha un htmlwindow en el que se muestra la informacion. Para ello, cada vez que se captura un evento en el indice, se toma cual es y se carga una pagina mediante el procedimiento LoadPage, se calcula el path segun las locales, de manera que siempre es /opt/caton/acept/documentos/tutorial/'$LC_LANG'/'documento'#'sección' donde $LC_LANG es la salida que podemos obtener al ejecutar en la shell echo $LC_LANG o en su defecto echo $LC_ALL, 'documento' es el nombre del fichero que se va a abrir de entre los siguientes:
+
+blank.html
+ini_conf_usr.html
+av_conf_000.html
+
+	y 'sección' es una parte optativa que referencia a un link dentro del propio documento html que puede tener los siguientes valores:
+
+crear
+listas
+
+	Ademas hay una clase imprime que posibilita sacar una version, con los graficos mas pequeños, por la impresora mediante el método HtmlEasyPrinting.
+	
+	El path de estos documentos es el mismo que el que se usa para el método LoadPage con la cadena '-print' al final.
+
+
+
+B)Demonio de la aplicacion
+
+'Mefistofelina', es el demonio de la aplicacion ACEPT. Es el encargado de monitorizar las sesiones que distintos usuarios tienen abiertas en el sistema y aplicar a cada uno de ellos las politicas que se le han definido. 
+
+Son cuatro las funciones que ha de realizar mefistofelina: mantener el control de acceso al equipo, vigilar que se respeten las cuotas de uso de las aplicaciones,aplicar las politicas de filtrado de contenido a los usuarios y guardar registros del uso que se ha realizado de Internet y resto de aplicaciones.
+
+  i.Control de acceso
+
+El establecimiento del control de acceso se hace configurando el modulo pam del sistema. La configuracion establecida para cada usuario en el archivo de configuracion de acept (/etc/acept/watcherCat/watcherconf.xml), se vuelca en el archivo de configuracion de horarios que emplea el modulo pam '/etc/security/time.conf'. 
+
+  ii.Cuotas de uso
+
+La aplicacion de cuotas de uso, limites en tiempo y horario de uso de ordenador por cada usuario, se lleva a cabo siguiendo un control de la actividad que cada uno de los usuarios tiene en el sistema.
+
+  iii.Filtrado de contenido
+
+El sistema de filtrado de contenidos se basa en squid y en su plugin squidGuard. Para que sea posible configurar distintas politicas de acceso para distintos usuarios, el sistema funciona levantando una instancia de squid, con las correspondientes instancias de squidGuard, para cada usuario que tiene filtrado su acceso a Internet. Así en cada momento sólo se encuentran levantadas las instancias de los usuarios en ese momento conectados al sistema, con su acceso web filtrado. Mefistofelina se encarga de periodicamente comprobar quien hay conectado al equipo, si tiene alguna politica de filtrado web, en cuyo caso, si la correspondiente instancia no esta ejecutándose la inicia. De igual modo, se encarga de detener aquellas instancias en ejecucion cuyo usuario ya no se encuentra conectado al sistema, así como de que estas instancias trabajen con la configuracion adecuada para el usuario.
+
+  iv.Registro uso de aplicaciones
+
+La recopilación de registros de uso web y de aplicaciones se realiza a traves de  dos vias. La primera de ellas, a traves de la cual se registra la informacion sobre el acceso que los usuarios han hecho a Internet, se hace mediante la aplicacion sarg. 'Sarg' es una herramienta para generar registros de análisis de squid, con la que se obtienen informes resumenes sobre que accesos han realizado los usuarios. Mefistofelina esta configurada para periodicamente lanzar esta aplicacion para cada uno de los usuarios que tiene definida algun tipo de politica de filtrado de acceso web, de modo que se almacenan estos registros en /var/www/squid-reports/$USUARIO/$PERIODO, segun el periodo ($PERIODO) al que correspondan los datos que recogen. 
+
+La segunda via de obtención de registros de datos acerca del uso del equipo es el propio control que mantiene mefistofelina sobre el uso de las aplicaciones. Mefistofelina guarda registros del uso que cada usuario ha hecho de cada aplicacion monitorizada en el archivo de configuracion de la aplicacion. Mefistofelina se encarga de volcar estos datos a archivos de estadisticas, ubicados en /opt/caton/watchercat/estadisticas, antes de que sean borrados para registrar el uso en el nuevo día, semana o mes. 
+
+Los archivos se denominan: aplic_TXXAAAA.txt, donde: 
+T: intervalo de tiempo al que corresponden: (m: mes, s: semana)
+XX: identificación numérica del intervalo a que corresponden. Si T=m, número de mes (01-12), si T=s, número de semana (01-55).
+AAAA: año al que corresponden los datos.
+
+Su contenido tiene el formato:
+<servicio> <usuario> tiempo
+<servicio> : servicio o aplicacion usada
+<usuario> : usuario 
+tiempo: tiempo de uso de dicho servicio por el usuario especificado en este periodo.
+
+C)parametros de ACEPT
+
+El comportamiento de ACEPT esta condicionado por ciertos parametros. estos se definen en el fichero mefiGlobal.py, y su modificacion afecta directamente a la capacidad de respuesta de la aplicacion. 
+Entre ellos, el parametro tiempo.intervalo define la cantidad de tiempo, en segundos, tras la cual se almacenan los consumos registrados.
+
+5.Especificación de las funciones de ACEPT
+
+En este apartado se presenta la especificación de las funciones implementadas en ACEPT. En el apartado anterior se dan unas pinceladas sobre la estructura del codigo de ACEPT.
+
+Codigo de la aplicacion grafica
+
+El núcleo principal de la interfaz grafica de ACEPT es gui.py. A éste se unen varios archivos, los correspondientes a cada uno de los componentes de la aplicacion grafica: 'wizard.py' del asistente, 'avanzado.py' de la aplicacion de configuracion avanzada y 'ayuda.py' de la ayuda en línea.
+
+Dos componentes auxiliares mensaje.py e informe.py son empleados para mostrar informacion al usuario monitorizado. El primero de ellos muestra el mensaje gráfico que le informa a su entrada al sistema que uso puede hacer del PC y el segundo se emplea para  mostrar avisos que le informan de la proximidad del fin de uso de algun servicio o de la propia sesión. 
+
+
+codigo del demonio de la aplicacion
+
+El cuerpo del demonio de ACEPT, mefistofelina, se recoge en el archivo del mismo nombre, mefistofelina.py. A éste le acompañan una serie de archivos en los que se estructuran las funciones que el demonio lleva a cabo, entre ellos el archivo mefiGlobal.py donde se recogen una serie de parametros y variables globales que condicionan la ejecucion del demonio. 
+
+Las funciones mediante las cuales se establece el control de acceso al equipo, la contabilización del uso de los servicios monitorizados y la aplicacion de las cuotas de uso definidas se recogen en el archivo watcherMods.py.
+
+Toda la funcionalidad del filtrado de contenido se  recoge en watcherSquid.py, que a su vez hace uso de los archivos func_blacklists.py, donde se implementan las funciones con las que se realiza la descarga y actualización de la base de datos para el filtrado de squid y func.py, donde se definen una serie de funciones generales empleadas en otras partes de la aplicacion.
+
+
+mefistofelina.py
+
+	codigo principal del demonio mefistofelina que lleva a cabo control horario y de acceso, configura el pam para el control de acceso a la máquina por parte de los usuarios, así como contabiliza el uso que se realiza de los servicios que estan siendo monitorizados.
+
+	Se contabiliza el tiempo de los servicios, tanto tcp como udp, que se encuentran definidos en el archivo de configuracion /etc/acept/watcherCat/watcherconf.xml, cuyo usuario tambien aparece contemplado en este archivo  y el servicio esta activo para ese usuario. Para ello se usa 'servicio_activo' (func.py).
+	
+	El demonio acepta que el sistema le envié señales mediante kill, concretamente captura TERM (-15) para terminar ordenadamente y SIGCONT (-18 ) para releer el archivo de configuracion, para el resto de señales se comporta normalmente segun el siguiente esquema extraído de man 7 signal:
+
+	Para ello inicialmente guarda su pid en el archivo /var/run/mefistofelina.pid extrayéndola del comando os.getpid() y despues se pone a escuchar las señales con estas dos líneas:
+
+signal.signal(signal.SIGTERM,handler)
+signal.signal(signal.SIGCONT,handler)
+
+La funcion handler, que es la que se ejecuta cuando se recibe la señal se encuentra en watcherMods.py.
+
+Tras eso se pasa al bucle principal del programa que se encarga de leer la configuracion del archivo '/etc/acept/watcherCat/watcherconf.xml' mediante una serie de funciones que se encuentran en watcherMods.py, y que se encargan de leer las conexiones abiertas tcp y udp - conexiones() -, actualizar la hora - fecha() -  , comprobar  la fecha anterior - ultima_fecha() - y comprobar si ha cambiado el día, la semana o el mes y en caso de que corresponda generar los registros de navegación pertinentes -generar_registros_periodicos()-, configurar pam en caso de que sea necesario - modifica_pam_d() y configura_time_conf() - , cargar los servicios que se han definido en el archivo de configuracion - servicios() - , cargar la configuracion de los usuarios y sus consumos - usuarios()  y restricciones() -  y configura las reglas de iptables - configura_fw() - ,siempre que la variable global relee.configuracion sea cierta.
+
+Luego monitoriza que no haya que expulsar a algun usuario porque haya sobrepasado los limites que tiene asignados en el uso del pc - saca_usuarios() - y asigna las conexiones abiertas a los usuarios que las estan usando mediante  dos bucles anidados, dos para las conexiones tcp y dos para las udp a dos diccionarios que guardan la forma de usuario+servicio:[datos]. Si una de estas conexiones es nueva se añade y si desaparece alguna se guarda a no ser que el usuario tenga una prorroga.
+
+Posteriormente en otra serie de bucles, recorre las listas que se han creado anteriormente y si se sobrepasan los limites que tiene un usuario, se reconfiguran las iptables para negarle el servicio en el que se haya excedido, antes, cuando le quedan 10 minutos ( configurable mediante tiempo.aviso en mefiGlobal.py ) se le manda un mensaje de advertencia que recorre todos los lugares del sistema donde este conectado el usuario, mediante el script mensaje.py.
+
+Tras eso espera un tiempo, - time.sleep(intervalo) - , graba periodicamente los consumos en el archivo de configuracion y retoma de nuevo el bucle.
+
+Al finalizar el programa, limpia las iptables.
+
+
+
+ watcherMods.py
+
+	modulos empleados por mefistofelina con los que se establece el control de acceso a los usuarios mediante el pam,  se controla el uso establecido de los servicios para los usuarios y se aplican las politicas de uso establecidas mediante la aplicacion grafica.
+	
+conexiones ():
+Comprueba los puertos que tiene abiertos el sistema y los devuelve en una tabla con el siguiente formato:
+tcp
+udp
+puerto
+ip
+uid
+puerto
+ip
+uid
+
+No acepta parametros.
+Lee de /proc/net/tcp y /proc/net/udp y convierte los datos en hexadecimal a decimal.
+
+n2u_u2n (nick):
+Lee /etc/passwd y devuelve el nick en caso de que se le pase como parametro una uid o el uid en caso de que se le pase como parametro un nick.
+Si se le pasa un parametro incorrecto, devuelve False.
+
+nick2uid (nombre):
+Alias para n2u_u2n.
+
+uid2nick (numero):
+Alias para n2u_u2n.
+
+servicios ():
+Lee en el archivo de configuracion, definido por la variable global archivo.configuracion en mefiGlobal como '/etc/acept/watcherCat/watcherconf.xml', la descripción de los servicios , nombres y puertos que tienen asignados, y devuelve una tabla con ellos.
+
+(posicion [0]][0]) nombre
+(posicion[0][1]) puertos udp
+
+(posicion[0][1]) puertos tcp
+
+
+actualiza_consumo (config):
+Actualiza los campos correspondientes al consumo de los usuarios en el archivo de configuracion con el consumo actual.
+Precisa como argumento una tabla que tenga el usuario, el servicio, el campo y el tiempo, siendo estos dos últimos listas.
+["total_diario","total_semanal","total_mensual"]
+[td,ts,tm] donde td es el total diario en formato "hh:mm:ss" y así correlativamente.
+
+fecha ():
+Devuelve una cadena con la fecha del sistema en el siguiente formato:
+hora minuto segundo dia_mes dia_semana semana mes año
+	Por ejemplo, siendo hoy martes 21 de marzo del 2006 a las 19:55 devolvería lo siguiente: 
+		'19:55 19 55 00 21 Tue 12 03 2006 ' 
+
+ultima_fecha ():
+Devuelve una cadena con la ultima fecha en el que se lanzó el demonio, registrada en el archivo de configuracion en el siguiente formato:  'dia semana mes año'
+
+actualiza_fecha (nueva_fecha):
+Actualiza la fecha registrada en el archivo de configuracion, acepta como parametro una cadena con el formato 'dia semana mes año'. 
+Por ejemplo:  '21 12 03 2006'
+
+modifica_pam_d ():
+Comprueba que los archivos dentro de /etc/pam.d/* tengan todos la entrada "account requisite pam_time.so" y en caso contrario la añade.
+Esta entrada es necesaria para impedir que un usuario pueda logearse en el sistema a deshora.
+
+configura_time_conf ():
+Lee las restricciones horarias para logearse en el ordenador del archivo de configuracion y los vuelca en el formato apropiado en /etc/security/time.conf .
+
+calcula_tiempo (hora1, hora2):
+Calcula la diferencia de tiempo entre dos horas que se le pasan como parametros, en el formato 'hh:mm:ss' y la devuelve como otra cadena con el mismo formato.
+
+suma_horas (hora1, hora2):
+Suma dos horas que se pasan como parametro, con el mismo formato que el anterior y devuelve el resultado en otra cadena.
+
+
+puerto2name (puerto, protocolo):
+Devuelve una cadena con el nombre del servicio al que corresponde un puerto dado, pasado como parametro en forma de entero, del protocolo especificado, 'tcp' o 'udp'  .
+
+restricciones (d_us):
+Retorna los limites de un usuario, toma como entrada la salida de la funcion "usuarios()".
+
+handler (signum, frame):
+Cuando el demonio recibe una señal mediante kill, esta es la funcion que analiza la señal, y si se trata de -15 o -18, las procesa de manera especial, principalmente cambiando los valores de relee.configuracion o finaliza.ya .
+
+restaura_consumo (campo, valor):
+Modifica los nodos xml en el archivo de configuracion de nombre 'campo' con 'valor'.
+
+prorroga (us, serv):
+Acepta como parametros dos cadenas, el nombre del usuario y el nombre del servicio que se desea saber si tiene prorroga, devuelve True en caso afirmativo y False en el caso contrario.
+
+fija_horarios (usr, rango):
+Modifica el archivo de configuracion con los nuevos horarios de acceso al pc. Toma como parametros una cadena con el nombre del usuario y otra con la configuracion de los dias y horas. Esta ultima esta compuesta por hasta siete elementos cuyo formato es DDhhmm-hhmm, donde DD representa el dia y toma los valores: Mo (lunes)| Tu (martes)| We (miércoles)| Th (jueves)| Fr (viernes)| Sa (sábado) | Su (domingo), y hhmm-hhmm define el horario para ese dia de la semana (hora inicio-hora fin) .
+	Por ejemplo: We1700-2000Th1700-2000Fr1700-2000Sa0900-1400Su0900-1400 
+	para indicar los  miércoles, jueves y viernes de 17pm a 20pm; sabados y domingos de 9 am a 14 pm.
+
+lista_usuarios (uid_min):
+Retorna una lista de los usuarios por encima de una uid dada, si esta uid, que se la pasa como parametro es 1000, no muestra tampoco los usuarios squid y nobody.
+
+usr_srv (usr):
+Toma como parametro una cadena con el nombre del usuario y devuelve una lista con los servicios que tiene configurados.
+
+uso_pc (usr):
+Esta funcion acepta los mismo parametros que la anterior y devuelve dos listas, una de las horas y otra de los días en los cuales se puede logear el usuario al pc.
+[h1, m1,  h2, m2][ 'MoTu'] (los días tienen el mismo formato que fija_horarios ).
+
+serv_user (usr):
+	Esta funcion acepta como parametro un nombre de usuario y devuelve un diccionario con los servicios 		configurados del usuario, horas consumidas y prorrogas.
+
+mata_wxsu ():
+Lee el pid del proceso acept.py desde /tmp/acept.pid, que se encarga de validar el password de root y lo mata.
+
+elimina_srv (servicio):
+Borra el servicio que se le pasa como cadena a la funcion del archivo de configuracion.
+
+crea_srv (servicio, puertos_tcp, puertos_udp):
+Toma como parametros una cadena con el nombre del servicio que se va a crear y dos listas, una de los puertos tcp que componen el servicio y otra con los puertos udp.
+
+tod_serv (usuario):
+	Comprueba si el usuario que se le pasa como parametro no tiene ninguna restricción en los servicios,en 	cuyo 	caso devuelve True. En caso contrario, False.
+
+avanz_usr(todos, user, tabla):
+Establece la configuracion de un usuario en el archivo de configuracion, acepta como parametros un booleano que indica si el usuario no tiene restricciones ( True ), una cadena con el nombre del usuario que vamos a configurar y una tabla con los servicios que estan implicados con la siguiente estructura, siendo todas las variables cadenas:
+
+nombre
+limite diario
+limite semanal
+limite mensual
+total diario
+total semanal
+total mensual
+prorroga
+""
+
+nodo_usuario (usr):
+Crea la estructura basica de un usuario, el nodo xml,  en el archivo de configuracion en caso de no existir.
+
+integridad_config ():
+Comprueba que el archivo de configuracion no esta vacio, y en caso de que lo este lo sustituye por una copia de seguridad, definida en mefiGlobal en la variable archivo.backup como '/etc/acept/watcherCat/watcherconf.bak' .
+
+configura_fw ():
+funcion escribe archivo con reglas iptables que han de cargarse en el sistema, segun las politicas definidas en el archivo de configuracion y las instancias de squid lanzadas en el sistema. estas ultimas se usan para canalizar el tráfico web del usuario monitorizado al puerto en el que escucha la correspondiente instancia de squid. Para ellos hace uso de las funciones definidas en func.py: 
+	users_conect: devuelve lista de usuarios no-root, con sesiones abiertas en el sistema, con politicas de control de acceso web definidas para ellos y con el servicio web activo
+	squid_port_user : devuelve puerto en el que escucha la instancia de squid asociada a dicho usuario.
+
+usuarios():
+funcion construye lista de consumos de servicios de cada usuario, excluyendo entre los hijos del nodo correspondiente al servicio 'web', si existe, 'denegado' y 'squid_pt', incorporados para la configuracion de filtrado de contenido que se aplica a ese usuario.
+
+restaura_consumo(campo, valor):
+funcion modifica todos los nodos cuyo nombre responde al especificado, obteniendo una lista de estos nodos a traves de la funcion 'getElementsByTagName', y estableciendo su valor al indicado.
+
+restaura_dia()
+Establece todos los campos total_diario a '00:00:00', haciendo uso de la funcion 'restaura_consumo', y pone todos los servicios como activos. 
+
+restaura_semana()
+Establece todos los campos total_semanal y total diario a '00:00:00' y todos los servicios como activos,  haciendo uso de las   funciones 'restaura_consumo' y 'restaura_dia'.
+
+restaura_todo()
+Limpia los totales acumulados para todos los servicios y establece todos los servicios como activos, para ello hace uso de 'restaura_consumo' y 'restaura_semana' . 
+
+actualiza_consumo(config):
+Recibe listado de consumos de servicios y usuarios, actualiza los datos en el archivo de configuracion. Para modificar estos campos hace uso de  la funcion xpath. Evaluate de la libreria xml, comprobando previamente si ese usuario tiene establecidos limites de uso para ese servicio. 
+
+recopila_aplic_mensual(file_conf):
+Modulo recopila en archivo de texto, con nombre: aplic_mMMAAAA.txt en ubicacion: 
+'/opt/caton/watchercat/estadisticas', datos de uso de los servicios por parte de los usuarios monitorizados en el sistema. Formato de entradas en el archivo:
+	nombre_servicio	nombre_usuario	tiempo_consumido
+Los datos registrados corresponden al mes(MM) del año(AAAA) recogido en el nombre del archivo.
+
+recopila_aplic_semanal(file_conf):
+Modulo recopila en archivo de texto, con nombre: aplic_sSSAAAA.txt en ubicacion: 
+'/opt/caton/watchercat/estadisticas', datos de uso de los servicios por parte de los usuarios monitorizados en el sistema. Formato de entradas en el archivo:
+	nombre_servicio	nombre_usuario	tiempo_consumido
+Los datos registrados corresponden a la semana (SS) del año(AAAA) recogido en el nombre del archivo.
+
+
+watcherSquid.py
+	
+	Agrupa modulos que implementan la funcionalidad del filtrado web para el demonio de la aplicacion. modulos que examinan instancias de squid lanzadas, las lanzan, detienen o reconfiguran.
+	
+lanzado_squid(user,SQdir):
+Comprueba si la instancia de squid para un usuario esta lanzada (comprueba si existe el correspondiente archivo squid.pid). Como la detección de una instancia de squid tiene un retardo de unos segundos, ademas de la existencia de este archivo, comprueba si existen las correspondientes reglas iptables que redireccionan el trafico web de este usuario al puerto en el que se encuentra escuchando la instancia de squid correspondiente, ya que a partir del momento en el que se ordena detener la instancia de squid, dejan de cargarse sus reglas.
+	
+inic_squid(user,SQdir): 
+Lanza la instancia de squid con la configuracion del usuario indicado.
+	
+stop_squid(user,SQdir): 
+Detiene la instancia de squid del usuario indicado
+
+reconf_squid(user,SQdir):
+Reconfigura la instancia de squid del usuario indicado.
+	
+detener_squid(file_conf): 
+Detiene todas las instancias de squid lanzadas.
+
+reconfigure_squid(file_conf):
+Actualiza todas las instancias de squid en ejecucion en ese momento.
+	
+apply_conf_squid(file_conf): 
+Examina que instancias de squid deben estar lanzadas, y cuales deben ser detenidas atendiendo a los usuarios que estan conectados al sistema, procediendo a realizar las acciones correspondientes.
+	
+examina_permisos(file_conf): 
+Verifica que la estructura de directorios con la que trabaja acept para filtrado de contenido tiene establecidos los permisos y propietarios correctos.
+	
+genera_registros_periodicos(file_conf): 
+Genera registros de navegación para cada uno de los usuarios con politicas de control web definidas lanzando la aplicacion sarg.
+
+guardar_reg_nav(file_conf): 
+Determina si ha de lanzarse la aplicacion que genera registros de navegación de los usuarios controlados por squid, comprobando la fecha de la ultima generacion de registros (o instalacion del sistema), y el intervalo de tiempo establecido.
+	
+actualiza_blacklists(file_conf): 
+Determina si debe de lanzarse la aplicacion que actualiza las blacklists del sistema, comprobando la fecha de la ultima actualización de las mismas. 
+	
+ublacklists(file_conf): 
+Actualiza las blacklists del sistema, comprobando si existen versiones mas actuales y sustituyendo en ese caso las actuales.
+
+squid_residual(file_conf):
+Limpia del sistema instancias de squid residuales que puedan existir en el inicio de la aplicacion acept.	
+
+		
+func_blacklists.py
+
+	modulos empleados  para la actualización automática de las listas negras del sistema desde las fuentes. Usados por ublacklists (watcherSquid.py).
+
+removeall(path, file_log)
+Vacía contenido de directorio especificado 'path', si path es un directorio.
+
+renuevadir(directorio, file_log)
+Renueva directorio especificado, eliminandolo si ya existia y creándolo de nuevo.
+
+creadir(directorio, file_log)
+Crea directorio indicado si no existe.
+
+consulta_fecha(archivo, directorioBD)
+Devuelve fecha de archivo si ha sido descargado en el sistema con anterioridad.
+
+descarga(url, temporal, destino, directorioBD, file_log)
+Descarga archivo se encuentra en url especificada, si esta accesible y es del tipo adecuado, en directorio temporal para despues ubicarlo en el que sera su destino definitivo.
+
+descomprime(nombre, directTmp, archivo)
+funcion descomprime archivo indicado en ubicacion temporal, directTmp.
+
+existe_grupo(nombre, grupos)
+Comprueba si grupo especificado se encuentra ya definido en el archivo de configuracion de acept.
+	
+append_grupo(grupo, descripcion, obj_archivo, archivo, destino)
+Incluye grupo especificado en archivo de configuracion de acept, con entradas que contiene.
+	
+copia_grupo(origen, destino)
+Copia contenido de grupo descargado desde ubicacion temporal a ubicacion en base de datos sin incluir archivos de parches.
+	
+inserta_blacklist(fullpath,DBhome,nombre,xmldoc,f_log,file_conf)
+funcion incluye las blacklists descargadas desde las fuentes, incluyendo en el archivo de configuracion los grupos que no aparecían previamente.
+
+
+informes.py
+
+	Funciones empleadas para la extracción de la informacion solicitada por el administrador a traves de la aplicacion grafica sobre los registros de navegación  web y las estadisticas de uso de aplicaciones que guarda el sistema de los usuarios.
+
+existe_registro(usuario,periodo,file_conf)
+Comprueba si existe registro de acceso web para el usuario especificado en el periodo considerado.
+
+users_con_registro(periodo,file_conf)
+Devuelve listado de usuarios con politicas de control web definidas que cuentan con registros de navegación en el periodo de tiempo especificado.
+
+cuenta_pg_user(file)
+Obtiene el numero de paginas web distintas visitadas por un usuario, segun se recoge en archivo especificado.
+
+cuenta_pg_users(Varhome,periodo,Rghome,file_conf
+Vuelca en archivo de texto número de paginas visitadas por cada uno de los usuarios con politicas de control web definidas.
+
+trafico_usuario(Varhome,periodo,Rghome,file_conf)
+Vuelca en archivo de texto trafico web registrado por cada uno de los usuarios con politicas de control web definidas.
+
+pag_usuario(Varhome,periodo,Rghome,file_conf)
+Vuelca en archivo de texto paginas web visitadas por usuarios con politicas de control web definidas, ordenadas por los usuarios que las visitaron.
+
+pag_url(Varhome,periodo,Rghome,usuario,file_conf)
+Vuelca en archivo de texto paginas web visitadas por uno o todos los usuarios con politicas de control web definidas, ordenadas por nombre de la pagina.
+
+pag_cron(Varhome,periodo,Rghome,usuario,file_conf)
+Vuelca en archivo de texto paginas web visitadas por uno o todos los usuarios con politicas de control web definidas, ordenadas cronológicamente, de mas reciente a menos reciente.
+
+pag_nvisit(Varhome,periodo,Rghome,usuario,file_conf)
+Vuelca en archivo de texto paginas web visitadas por uno o todos los usuarios con politicas de control web definidas, ordenadas por número de visitas.
+
+pag_trafic(Varhome,periodo,Rghome,usuario,file_conf)
+Vuelca en archivo de texto paginas web visitadas por uno o todos los usuarios con politicas de control web definidas, ordenadas por tráfico registrado.
+
+pag_clave(Varhome,periodo,Rghome,usuario,file_conf,clave)
+Extrae lista de urls visitadas por uno o todos los usuarios con politicas de control web que contienen la palabra clave indicada.
+
+genera_registros_nuevos(file_conf)
+Genera registros de navegación desde la ultima fecha en la que se recogieron hasta la fecha actual.
+
+aplic_tmp_uso(usuario,periodo,file_conf)
+Recopila informacion  sobre el uso de los servicios monitorizados por parte de los usuarios controlados por nuestra aplicacion (por todos o alguno de ellos), contabilizando el total de tiempo que han sido usados en el periodo seleccionado.
+Devuelve un diccionario, las claves corresponden a los servicios, teniendo asignado a cada servicio un total de tiempo que ha sido usado.
+
+aplic_usuario(periodo,file_conf)
+Recopila listado de aplicaciones que han sido utilizadas por los usuarios monitorizados por nuestra aplicacion, en el periodo indicado.
+Devuelve un diccionario, las claves corresponden a los servicios, y cada servicio tiene asignado una lista de usuarios que lo utilizaron.
+
+extiende_periodo(tipo,periodo)
+Añade a indicador de periodo aclaración que especifica a que mes del año corresponde ese periodo.
+
+
+func_navegacion.py
+
+	Recoge funciones auxiliares empleadas por las funciones que obtienen la informacion de los registros web y de aplicaciones.
+
+numeric_compare(x,y):
+Devuelve diferencia entera entre dos números.
+
+normaliza_cad(cad):
+Normaliza resultado manteniendo sólo dos números decimales del mismo.
+
+transforma_url(url):
+Transforma url a formato en el que se encuentra archivo en el que se describen los acceso a dicha url.
+
+ultimo_acceso(archivo_url):
+Devuelve fecha ultimo acceso a url, segun especifica el archivo indicado.
+
+cmp_acceso(ult_acceso,acceso):
+Compara dos fechas, devuelve cual de ellas es mas reciente, o si ambas coinciden.
+
+cambia_cadena(archivo, cad_nueva , cad_anterior):
+Cambia apariciones de cadena 'cad_anterior' por 'cad_nueva' en archivo indicado.
+
+modifica_html(user, nombre_final, nombre_orig, file_conf):
+Modifica registros generados para usuario estableciendo nomenclatura para periodo considerado por acept en lugar del que por defecto establece sarg.
+
+extrae_cab(usuario, periodo, file_conf):
+Modulo usado cuando version de sarg es 2.0 o superior, se extrae subdirectorio en el que se almacenan ficheros describen accesos a cada url accedida por usuario.
+
+
+func.py
+
+	Archivo en el que se incluyen los modulos genéricos, comunes a las distintas funciones de la aplicacion.
+
+parse_file(file_conf):
+Devuelve estructura de archivo xml parseado, tras conseguir parsearlo con éxito.
+
+escribe_log(cadena, fichero):
+Imprime mensaje en archivo, anteponiendo fecha y hora actual.
+
+consulta_campo(campo, file_conf):
+Devuelve valor de campo consultado en archivo de configuracion.
+
+actualiza_campo(campo,valor,file_conf):
+Establece campo especificado a valor indicado en archivo de configuracion.
+
+servicio_activo(usuario,servicio, file_conf):
+Devuelve True si servicio aparece como activo en archivo de configuracion para el usuario que se indica.
+
+web_activo(usuario,file_conf):
+Devuelve True si el usuario tiene como activo el servicio web en el archivo de configuracion.
+
+extrae_users(file_conf):
+Extrae lista de usuarios que aparecen definidos en el archivo de configuracion.
+
+control_web_user(usuario,file_conf):
+Devuelve True si el usuario que se consulta tiene definida alguna politica de control de acceso web.
+
+users_control_web(file_conf):
+Devuelve lista de usuarios definidos en la aplicacion acept con politicas de filtrado de contenido web.
+
+users_conect(file_conf):
+Devuelve lista de usuarios no-root, con sesión abierta en el sistema, con politicas de filtrado web definidas, y el servicio web activo.
+
+squid_port_user(usuario, file_conf):
+Devuelve el puerto establecido para la instancia de squid que aplica la politica de filtrado web definida para el usuario.
+
+indice_mes(mes):
+Devuelve indice numérico del mes especificado, se especifica el mes con cadena que puede encontrarse en inglés o español.
+
+dias_mes(mes):
+Devuelve número de días que componen el mes especificado.	
+
+
+inicSquid.py
+
+	modulos para la inicialización de los archivos necesarios para el filtrado de contenido.
+
+inic_squid_users(file_conf):
+Lee la configuracion de squid para cada uno de los usuarios del sistema, para los que se ha definido algun tipo de politica de control web, y crea el correspondiente archivo squid_$USER.conf que sera usado para lanzar la correspondiente instancia de squid.
+	
+inic_sarg_users(file_conf):
+Crea, si no existe, el archivo de configuracion de sarg para los usuarios que tienen algun tipo de politica de control web definida.
+	
+apply_conf_squidguard(file_conf):
+Construye el archivo de configuracion de squidguard, para aplicar las politicas de control de acceso definidas para cada uno de los usuarios del sistema, segun la configuracion que se encuentra en el archivo /etc/acept/watcherCat/watcherconf.xml
+	
+inic_direct_users(file_conf):
+Comprueba si la estructura de directorios necesaria para el funcionamiento de squid para cada usuario con alguna politica de control web definida existe y es la correcta, si no es así la crea.
+ 
+
+confSquid.py
+
+	modulos implementan funcionalidad para configurador avanzado de acept en cuanto a edición, modificacion, creación y eliminación de listas negras locales del sistema, configuracion de acceso de usuarios y extracción de estadisticas y registros de uso web y de aplicaciones.
+
+cadenas_grupo(grupo, file_corresp)
+Devuelve lista de blacklists asociadas a grupo de contenidos en archivo que establece correspondencias para asistente de configuracion.
+
+grupo_cadena(cadena, file_corresp)
+Devuelve grupo de contenido al que se asocia la blacklists especificada segun archivo que establece correspondencias para asistente de configuracion.
+
+inic_control_web(usuario, denegado, file_conf)
+Modifica archivo de configuracion con las politicas de control web establecidas para el usuario. Recibe el usuario y una cadena con los contenidos que le van a ser bloqueados.
+
+local_blacklists(file_conf)
+Modulo devuelve listado de listas negras locales definidas por el usuario en el sistema. Estas se registran en archivo de configuracion con etiqueta local= yes.
+
+inserta_grupo(nombre, file_conf)
+Inserta blacklist local en archivo de configuracion.
+
+inserta_blacklist(blacklist, domainlist, file_conf)
+Modulo recibe nombre de blacklist a crear o actualizar, con lista de dominios que incluye y archivo de configuracion de acept .Comprueba si existe en archivo de configuracion, si no existe la incluye entre los grupos de blacklists, especificando que se trata de una lista local. Comprueba si existe el directorio asociado en la base de datos de blacklists, si no existe lo crea. Abre el correspondiente archivo de dominios de la blacklists en modo escritura y en el vuelca la lista de dominios que recibió como segundo parametro.
+
+lee_blacklist(nombre, file_conf)
+Modulo recibe nombre de blacklist que va a ser editada. Abre el correspondiente archivo (o archivos) de dominios de esta lista y devuelve el contenido de éste como una lista de cadenas, cada uno de ellas corresponde a cada una de las entradas del archivo. 	
+
+elimina_blacklist(nombre, file_conf)
+modulo recibe nombre de blacklist que va a ser eliminado del sistema. Borra la entrada que tenía asignada en archivo de configuracion de acept. Elimina directorio que tenía en la base de datos de blacklists.*Si se encontraba incluida en el archivo que establece la correspondencia entre los grupos de contenidos y las blacklists, se borra de este archivo.
+
+lee_fuentes(file_conf) 
+Lee del archivo de configuracion de acept el listado de fuentes de blacklists que actualmente tiene configurado
+el sistema. Devuelve una lista, cada una de los elementos corresponde a una URL de una de las fuentes configuradas.
+
+actualiza_fuentes(lista_fuentes, frecuencia, file_conf)
+Modulo recibe el listado de fuentes  con las que va a trabajar el sistema y la frecuencia con la que deben actualizarse, escribe en archivo de configuracion esta informacion.
+
+listado_blacklists(file_conf)*
+Devuelve listado de blacklists existentes en la base de datos de squidguard.
+
+lee_userblacklists(usuario,file_conf)
+Devuelve listado de blacklists que usuario no tiene permitido el acceso.
+
+actualiza_userblacklists(usuario,blacklists,file_conf)
+Modifica archivo de configuracion actualizando la configuracion de acceso web con las listas de blacklists especificadas al usuario indicado. En caso de recibir un listado de blacklists vacio, comprueba si existía una configuracion anterior para el filtrado de contenido para este usuario, en cuyo caso se elimina.
+
+lee_whitelists(usuario, file_conf)
+Lee los dominios/urls que el usuario considerado tiene definidos como listas blancas para su acceso a ellas. Lee el archivo del directorio white_$USER en la base de datos de listas negras, y devuelve una lista e cadenas con cada una de las entradas que tiene definidas.
+
+actualiza_whitelists(usuario, domainlist, file_conf)
+Recibe una lista de dominios/urls a los que se le permite el acceso indiscriminado al usuario. Se abre el archivo de definicion de whitelist para dicho usuario y se escribe en él el listado de dominios. 
+
+extrae_periodos(file_conf) 
+Extrae listado de periodos de tiempo para los que se tienen almacenados registros de navegación web para todos los usuarios con control web.
+
+extrae_periodos_user(usuario, file_conf)
+Extrae listado de periodos de tiempo para los que se tienen almacenados registros de navegación para un usuario concreto.
+
+lee_fichero(file)
+Devuelve contenido de fichero especificado en forma de lista de cadenas, con cada una de las líneas que contiene el fichero.
+
+mostrar_reg_nav(opcion, usuario, periodo, file_conf, clave)
+Obtiene registros de navegación solicitados por el administrador, la informacion solicitada, para el usuario (o todos los usuarios que disponen de dicha informacion), si la opción lo contempla, en el periodo seleccionado. En caso de tratarse de una búsqueda por palabra clave, la palabra que se esta buscando entre las urls. Devuelve una lista con la informacion solicitada.
+
+extrae_periodos_user_aplic(tipo) 
+Extrae listado de periodos de tiempo para los que se tienen almacenados registros de uso de aplicaciones, del tipo indicado. Tipo especifica si se trata de periodos de meses o de semanas.
+
+mostrar_uso_aplicaciones(opcion, usuario, tipo, periodo,file_conf)
+Devuelve datos de uso de aplicaciones monitorizadas en periodo indicado.
+
+
+acept.py
+	
+	Comprueba el uid del usuario si es 0 llama directamente a gui.py, en cualquier otro caso interroga al usuario por el password de root,  y comprobando mediante pexpect, la salida de ejecutar su -c "auth.py", una vez  introducida la contraseña correcta, posibilita momentánemente la conexión a las X a todo el mundo, xauth +, llama a gui.py en un fork y vuelve a deshabilitar la accesibilidad de las X, xauth -.
+Extracto:
+
+password=self.text_ctrl_1.GetValue()
+child1=pexpect.spawn("su -c '/opt/caton/acept/auth.py'")
+child1.expect("[pP]")
+sleep(0.1)
+child1.sendline(password)
+child1.next()
+child1.next()
+aut=child1.next()
+aut=aut[:2]
+if aut =="Ok":
+if aut =="Ok":
+		a=os.fork()
+	if a == 0:
+		os.system("xhost +")
+		comando() 		# llama a gui.py como root
+	else:
+	      	pid=getpid()
+		f=open("/tmp/acept.pid","w")
+		f.write(str(pid))
+		f.close()
+		self.Hide()
+		sleep(1)
+		os.system("xhost -")
+		
+		
+else:
+	dlg = wx.MessageDialog(self, _('Password incorrecto'),
+
+auth.py
+	
+	Tan solo es un "print 'Ok'" que sirve para comprobar si la salida es esa, en caso de que la autenticación en acept.py sea correcta, o no.
+
+avanzado.py
+	
+	Interfaz grafica que contempla la configuracion de los horarios de los usuarios, de las listas negras y blancas de los mismo; la definicion y modificacion de servicios, la configuracion de las listas y fuentes del squid y la generacion de estadisticas.
+
+ayuda.py
+	
+	Esta Interfaz muestra las paginas de ayuda que se seleccionen en self.list_box_1 a la izquierda, o en los propios links internos de los documentos html, en self.info a la derecha. para cargar, una vez capturado el evento - wx.EVT_LISTBOX(self, self.list_box_1.GetId(), self.linka) - usamos el método - self.info.LoadPage(path) - La variable path se calcula segun las locales que tengamos configuradas.
+Para imprimir usamos una clase Imprime, que es wx.html.HtmlEasyPrinting .
+
+gui.py
+	
+	Interfaz grafica inicial, en ella se muestran tres botones con graficos, del tipo wx.lib.buttons.GenBitmapTextButton que dan acceso al asistente, a la configuracion avanzada, y a la ayuda.
+Al salir, se lee /var/run/mefistofelina.pid y se le ordena volver a leer el archivo de configuracion.
+
+
+
+informe.py
+	
+	Este programa genera una pagina web a partir de /etc/caton/acept/modelo.html que modifica para insertar los datos del usuario, nombre, horarios y consumos web, usando para ello la utilidad del sistema 'sed' . Se lanza al logearse mediante una llamada desde /etc/gdm/PostLogin/Default .
+
+mas_info.py
+	
+	Muestra los detalles del consumo de un usuario, sus, restricciones y prorrogas en una serie de tablas. Este Programa se puede llamar desde el boton "mas" de informe.py o de manera independiente.
+
+mensaje.py
+	
+	Rastrea donde se encuentra el usuario, haciendo uso de la libreria python-utmp y despues lanza un mensaje, sea de texto, sea gráfico en cada una de las localizaciones posibles. el nombre del usuario lo toma del primer argumento en la linea de comandos y el mensaje del segundo, por lo que este último generalmente deberá de ir entrecomillado.
+
+En caso de encontrarse en una terminal, tipicamente tty1, tty2... pts/1, pts/2 simplemente se abre ese dispositivo en modo de escritura y se escribe la alerta en el.
+
+if grafico == 1 :
+	try:
+	    f=open('/dev/'+j,'w')
+	    f.write('\n'+mensaje+'\n\n')
+	    f.close()
+	except:
+	    pass
+
+En caso de tener algun display en uso, primero determina el home del usuario y luego modifica las variables de entorno para que XAUTHORITY y DISPLAY sean correctas, esto lo hace en un fork ya que si no se establecen la primera vez, pero luego no cambian.
+Tras eso lanza una ventana con la alerta.
+
+elif grafico == 2 :
+	subproceso=os.fork()
+	if not subproceso :
+	    
+	    # Establece las variables de entorno.
+	    # En caso de no encontrar el archivo Xauthority del usuario, 
+	    # finaliza el subproceso
+	    if os.path.exists(home+"/.Xauthority"):
+		os.environ["XAUTHORITY"]=home+"/.Xauthority"
+		os.environ["DISPLAY"]=j
+	    else:
+		exit()
+
+	    import wx   # Alerta grafica ...
+
+
+wizard.py
+	
+	Interfaz grafica que guia paso a paso en la configuracion de las restricciones que pueda haber para un usuario seleccionado.
+En este caso, una vez finalizado el proceso, no se tienen en cuenta los consumos anteriores, dejándolos todos a cero.
+
+
+6. Internacionalización
+
+En este apartado comentaremos como se ha adaptado el codigo para que se pueda traducir de manera sencilla.
+
+A)Aplicacion grafica
+	Se ha optado por usar gettext, que es el estandar, para ello hemos usado las extensiones que el propio wx trae por defecto:
+
+		_=wx.GetTranslation
+		wx.Locale_AddCatalogLookupPathPrefix("/etc/acept/watcherCat/lang")
+		locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+		locale.AddCatalog("wizard")
+	
+	Cada archivo *.py tiene como contrapartida un catalogo *.mo y se referencia sin emplear la extension, estos se encuentran en /etc/acept/watcherCat/lang/$LC_LANG , en nuestro caso es es_ES y es_Es@euro ( links los dos últimos )
+
+	Para internacionalizar no hay mas que escribir la cadena que se desea traducir, por ejemplo 'dog', como par,ametro de la funcion _()
+		_('dog')
+
+	Debe de remarcarse que las cadenas que se encuentren dentro de esta funcion, no pueden tener carácteres que no se encuentren en el alfabeto inglés, tales como signos diacríticos, las aperturas de la exclamación y la interrogación y letras como la eñe o la 'ce trencada'.
+	Luego utilizamos la utilidad pygettext:
+		pygettext --output=fichero.po fichero.py
+
+	Editamos el archivo .mo con nuestro editor preferido, o con alguna utilidad expresamente diseñada para las traducciones como gtranslatos o kbabel:
+
+msgid ""
+msgstr ""
+"Project-Id-Version: ACEPT 1.0\n"
+"POT-Creation-Date: Wed Mar 22 12:09:13 CET 2006\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: nombre <email>\n"
+"Language-Team: español <es@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.3\n"
+
+msgid "dog"
+msgstr "perro"
+
+	Hecho esto tan solo resta ejecutar el siguiente comando para generar el catalogo :
+		msgftm --output=fichero.mo fichero.po
+	El archivo resultante lo guardaremos en /etc/acept/watcherCat/lang/xx/LC_MESSAGES donde xx es el codigo de nuestro idioma.
+
+B) La ayuda
+	Para traducir la ayuda, hay que traducir los archivos html que se encuentran en /opt/caton/acept/documentos/tutorial/es/ al idioma deseado, y guardarlos con el mismo nombre en un directorio dentro de /opt/caton/acept/documentos/tutorial/xx donde xx es el codigo del idioma al que los hemos traducido.
+	

@@ -1,0 +1,22 @@
+#
+# Fichero:	 Wishlist
+# Copyright: 	Junta de Andalucía <devmaster@guadalinex.org>
+# Autor: 	Maria Dolores Perez Gutierrez y Nestor Chacon Manzano
+# Fecha: 	mar 21 mar, 13:32:21 CET 2006
+# Licencia: 	GPL v.2
+# Proyecto impulsado y financiado por SADESI (Sociedad Andaluza para el Desarrollo de la Sociedad de la Informacion)
+#
+
+
+31/01/2006:
+	- Creacion funcion reconfigure instancias de squid lanzadas, 
+	de manera sea posible tener la aplicacion lanzada, cambiar 
+	la configuracion del sistema y los cambios tengan efectos
+	inmediatamente, no haya que esperar a que la aplicacion se inicie
+	de nuevo. 
+
+24/01/2006:
+	- Estandarizacion de la base de datos de blacklists, para poder 
+	trabajar con blacklists alternativas que incorporan caracteristicas,
+	como definicion de etiquetas 'blocked' y 'noblocked'.
+	

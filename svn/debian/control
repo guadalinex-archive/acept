@@ -1,0 +1,18 @@
+Source: acept
+Section: web
+Priority: optional
+Maintainer: Junta de Andalucia <packmaster@guadalinex.org>
+Build-Depends: debhelper , python-central , python-dev
+Standards-Version: 3.7.2
+
+Package: acept
+Architecture: i386
+Depends: ${shlibs:Depends}, ${misc:Depends}, squid (>= 2.6.2), squidguard, sarg, python, python-xml, python-pexpect, python-utmp, adduser, python-wxgtk2.6, python-support, python-central
+Description: Asistente para el control electronico paterno-materno
+ ACEPT es un asistente de ayuda para la configuracion de control 
+ del uso que los usuarios del equipo  pueden hacer del mismo. 
+ El control que puede establecerse considera tres aspectos:
+ establecimiento de horarios de uso, restriccion de tiempo de uso 
+ de las distintas aplicaciones de internet y filtrado de contenidos
+ accesibles via web, todo ello de forma personalizada  para cada usuario.
+

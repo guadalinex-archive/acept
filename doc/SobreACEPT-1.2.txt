@@ -1,0 +1,88 @@
+----------------------------------------------------------------
+SOBRE ACEPT 1.2 (Asistente para el Control Electronico PaTerno)
+----------------------------------------------------------------
+INSTALACION DE ACEPT-1.2
+---------------------------
+
+Se recomienda realizar la instalacion de Acept desde el paquete binario mas actual presente en 
+el repositorio (acept-1.2.6-20_i386.deb):
+
+    http://ws314.juntadeandalucia.es/repositorio/projects/acept/
+
+En la Seccion 'FICHEROS' ('DOCS').
+
+
+NOTA: SOLO PODRA INSTALAR ACEPT UN USUARIO CON PERMISOS DE ADMINISTRACION
+REQUISITO BASICO: EL SISTEMA DEBE TENER CONEXION A INTERNET.
+
+-----------------------------------
+ PASOS A SEGUIR EN LA INSTALACION
+-----------------------------------
+
+ - Asegurarnos nuestro sistema esta correctamente instalado y tiene conexion a internet 
+(tambien es posible instalarlo en sistema arrancado desde LiveCD).
+
+ - Modificamos las fuentes desde donde GUADALINEX busca los paquete, ya que muchas de las dependencias 
+ de ACEPT se encuentran en el repositorio de test de GUADALINEX. 
+ Para ello incluimos la siguiente linea en el archivo "/etc/apt/source.list"
+	deb http://v4.guadalinex.org/guadalinex-toro/ toro-test main
+
+ - Actualizamos la base de datos de paquetes del sistema:
+	sudo apt-get update
+
+ - Descargamos paquete de acept desde el respositorio
+
+ - Ejecutamos la orden que instala acept, desde el directorio donde lo hemos descargado:
+	sudo dpkg -i acept_1.2.6-20_i386.deb
+
+ - Se mostraran errores de que faltan dependencias en el sistema y no ha podido instalarse correctamente el paquete, 
+ para solventar estor ejecutaremos la siguiente orden, que instala las dependencias incompletas:
+	sudo apt-get -f install
+
+ - Nos consultara si queremos instalar algunos paquetes que no se encuentran firmados, responderemos que SI. 
+ Tras esto se habran instalados todas las dependencias y el propio ACEPT.
+
+ - La instalacion de los paquetes que necesita (squid,sarg,..) mostrara algunos mensajes de error,
+ IGNORAREMOS ESTOS MENSAJES, los paquetes al instalarse intenta por defecto arrancar estas 
+ aplicaciones, pero sera ACEPT quien posteriormente se encarge de iniciarlos correctamente.
+ 
+ - TODO ESTA OK, ACEPT SE HA INICIADO.
+
+-------------------------
+USANDO ACEPT 1.2
+-------------------------
+
+IMPORTANTE: ANTES DE PASAR A CONFIGURAR FILTROS PARA USUARIOS SE REALIZARA LO SIGUIENTE:
+
+Una vez instalada la aplicacion, debemos acceder a la interfaz grafica y seguir los siguientes pasos:
+
+- La herramienta de administracion de ACEPT se encuentra en el menu:
+	SISTEMA -> ADMINISTRACION -> ACEPT
+- En la ventana que aparecera pulsaremos el boton:
+	'CONFIGURACION ABANZADA'
+- Tras esto aparecera una nueva ventana con una serie de menus:
+- Pulsaremos en el menu 'CONFIGURAR', se despliega un submenu, escogeremos la entrada:
+	 'LISTAS'
+- En la ventana que se mostrara pulsaremos el boton:
+	 'ACTUALIZAR LISTAS'
+  Este proceso puede llevar algunos minutos. 
+
+- Una vez finalizado podremos utilizar toda la funcionalidad de ACEPT.
+ Para sacarle el mejor partido leed el 'MANUAL DE USUARIO'.
+
+---------------------------
+NOTAS DE ACEPT EN UBUNTU
+----------------------------
+
+Para instalar ACEPT en sistema UBUNTU sera necesario:
+
+1- Incorporar los repositorios 'universe'
+2- Establecer en el sistema la variable PYTHONPATH, con valor='/usr/lib/python2.4/site-packages'
+
+
+	
+	
+
+
+
+ 

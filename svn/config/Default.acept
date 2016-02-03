@@ -1,0 +1,12 @@
+#! /bin/sh
+#acept
+if [ -x /usr/share/acept/informe.py ];then
+	/usr/share/acept/informe.py $USER
+fi
+
+if [ -e /etc/gdm/PostLogin/Default.orig];then
+	if [ -z `head -2 | grep acept`];then
+		/etc/gdm/PostLogin/Default.orig
+	fi
+fi
+	

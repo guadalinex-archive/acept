@@ -1,0 +1,413 @@
+Acept-0.9				
+						Catn Sistemas Alternativos
+								Nestor Chacn Manzano
+								Mara Dolores Prez Gutirrez
+	
+MANUAL DE INSTALACIN, CONFIGURACIN Y USO DE ACEPT-0.9	
+			
+	
+	ACEPT (Asistente para el Control Electrnico Paterno),es un proyecto de la Junta de Andaluca cuyo objetivo es disponer de una serie de herramientas sobre Guadalinex, que permitan al padre, madre o tutor delimitar y controlar el uso que del ordenador, y particularmente de Internet, pueda hacer un menor.
+
+	A continuacin se detalla el contenido del paquete que aqu se presenta, an no tenemos disponible la versin paquetizada debian, en su defecto este paquete de fuentes para aquellos conocedores a un nivel medio de linux. Este manual pretende ser un texto claro y fcil de seguir que permita a casi todos los arriesgados al manejo de un sistema linux, sin necesidad de ser un gur para instalar y poner en funcionamiento acept.
+	
+   Este documento se encuentra disponible en:
+
+http://www.juntadeandalucia.es/repositorio/docman/view.php/8/13/Manual_instalacion_y_uso_0.9.sxw
+
+http://www.juntadeandalucia.es/repositorio/docman/view.php/8/14/Manual_instalacion_y_uso_0.9.txt
+
+
+
+1.Archivos necesarios para la instalacin completa del sistema:
+	
+   Paquete acept-0.9.tar.gz 
+
+  - Se encuentra en:
+
+	http://www.juntadeandalucia.es/repositorio/frs/download.php/19/acept-0.9-20060126.tar.bz2
+	
+  - Su contenido es:
+	
+opt/caton/documentacion
+Contiene documentacin del paquete:
+El presente manual
+Archivos: README, Changelog, Bugtracking, Wishlist
+
+opt/caton/watchercat
+Contiene cdigo de la aplicacin y directorios auxiliares
+
+etc/watcherCat 
+Contiene archivos de configuracin de programa
+
+usr/squid/etc/squid_acept.conf 
+Archivo de configuracin base para el funcionamiento de squid 
+
+usr/squid/etc/sarg_acept.conf
+Archivo de configuracin base para el funcionamiento de  sarg
+
+   Paquete debian  squid-3.0-acept
+	
+  - Se encuentra en:
+
+	http://www.juntadeandalucia.es/repositorio/frs/download.php/15/squid-3.0-acept_0.8b-1_all.deb
+	
+   Paquete debian squidguard-db
+	
+Se encuentra en:
+
+      http://www.juntadeandalucia.es/repositorio/frs/download.php/17/squidguard-db_4.4-1_all.deb
+
+
+    Paquete debian squidguard-acept
+
+  - Se encuentra en:
+
+	http://www.juntadeandalucia.es/repositorio/frs/download.php/16/squidguard-acept_1.2.0-1_all.deb
+
+   Las fuentes de estos paquetes se encuentran en las direcciones que a continuacin se indican:   
+
+   Fuentes de squid-3.0:
+	
+	http://www.squid-cache.org/Versions/v3/3.0/squid-3.0-PRE3-XXXXXXXX.tar.gz
+   
+   Fuentes de la librera BerkeleyDB:
+	
+	http://dev.sleepycat.com/downloads/optreg.html?fname=db-4.4.16.tar.gz&prod=core
+
+   Fuentes de squidGuard-1.2.0:
+
+	ftp.tdcnorge.no/pub/www/proxy/squidGuard/squidGuard-1.2.0.tar.gz
+
+
+2. Proceso de instalacin
+	
+	1- Instalar software necesario: squid,squidguard y sarg
+		
+		Si no te tienen instalados los siguientes paquetes han de instalarse:
+			
+			apt-get install g++ *
+			apt-get install flex m4*
+			apt-get install python2.3* python2.3-xml python2.3-pexpect
+
+			*paquetes no instalados con version Guadalinex 3 rc1
+		
+
+
+
+
+
+
+		A) Usando los paquetes .deb construidos 
+
+		  INSTALACION DE SQUID
+
+				dpkg -i $DIRECTORIO/packages/squid-3.0-acept_0.8b-1_all.deb
+			Se instala en /usr/squid
+			Se han de crear adicionalmente los directorios, si no se han creado:
+				/usr/squid/var
+				/usr/squid/var/logs
+				/usr/squid/var/cache
+				/usr/squid/var/rg
+
+		   INSTALACION DE SQUIDGUARD
+
+			Se necesita la librera BerkeleyDB, en packages se encuentra el paquete 				necesario:
+				dpkg -i $DIRECTORIO/packages/squidguard-db_4.4-1_all.deb
+			Se instala en /usr/BerkeleyDB
+			Se enlaza en el sistema, modificando (o creando si no existe), 
+			en /etc/ld.so.conf aadiendo
+				/usr/BerkeleyDB/lib
+			
+			*Tras este paso es recomendable reiniciar el sistema antes de continuar el 			proceso	
+				reboot
+	
+			Se ejecuta:
+				ldconfig
+			
+			Se pasa a instalar el paquete de squidGuard:
+				dpkg -i $DIRECTORIO/packages/squidguard-acept_1.2.0-1_all.deb
+			Se instala en /usr/squidGuard
+			Creamos directorio para logs de squidGuard
+				mkdir /usr/squidGuard/log
+		
+			Creamos directorio para base de datos de blacklists:
+				mkdir /var/lib/squidguard
+				mkdir /var/lib/squidguard/db
+
+
+		    INSTALACION DE SARG
+			
+			apt-get install sarg
+
+			El ejecutable se ubica en /usr/bin, el directorio donde almacena los registros 			de navegacin es /var/www/squid-reports 
+
+
+
+
+		B) Desde las fuentes
+
+          		     INSTALACION DE SQUID
+			
+			Archivo de fuentes se encuentra en 
+				$DIRECTORIO/sources/squid-3.0-PRE3-20051201.tar.gz
+			
+			Lo descomprimimos donde queramos, por ejemplo en /tmp:
+				tar zxvf squid-3.0-PRE3-20051201.tar.gz	
+				cd squid-3.0-PRE3-20051201
+			Lo configuramos con las siguientes opciones:
+
+			./configure --prefix=/usr/squid --enable-async-io --with-pthreads 
+		--enable-storeio=ufs,aufs,diskd,null --enable-linux-netfilter --enable-arp-acl 
+		--enable-removal-policies=lru,heap --enable-snmp --enable-delay-pools 
+		--enable-htcp --enable-pool  --enable-underscores --enable-referer-log 
+		--enable-useragent-log --enable-auth=basic,digest,ntlm --enable-carp 
+		--enable-large-files i386-debian-linux -enable-shared=yes
+
+		La opcion --prefix indica donde se instalara squid, si se especifica otra ruta, en lugar 	
+		de /usr/squid ($SQUID), debera de reflejarse este cambio en el archivo de configuracin 
+		/etc/watcherCat/watcherconf.xml
+
+			Compilamos e instalamos:
+			make
+			make install
+
+			Se han de crear adicionalmente los directorios, si no se han creado:
+				$SQUID/var
+				$SQUID/var/logs
+				$SQUID/var/cache
+				$SQUID/var/rg
+
+		   INSTALACION DE SQUIDGUARD
+
+			Se necesita la librera BerkeleyDB, en sources se encuentra el archivo de
+			fuentes correspondiente:
+				$DIRECTORIO/sources/db-4.4.16.tar.gz
+			Descomprimimos donde se quiera, por ejemplo: /tmp
+				tar zxvf db-4.4.16.tar.gz
+				cd db-4.4.16/
+				cd build_unix/
+			Configuramos:
+				../dist/configure -prefix=/usr/BerkeleyDB
+			
+			Con --prefix se indica el directorio donde se va a instalar
+
+			
+			Compilamos e instalamos:
+				make
+				make install
+			Se enlaza en el sistema, modificando (o creando si no existe), 
+			en /etc/ld.so.conf aadiendo
+				/usr/BerkeleyDB/lib
+			Ejecutando:
+				ldconfig
+			
+			Las fuentes de squidGuard tambin se encuentran en el directorio sources, 			Se descomprime donde se desee
+				tar zxvf squidGuard-1.2.0.tar.gz
+				cd squidGuard-1.2.0
+			Antes de nada es necesario aplicarle un parche que se encuentra en el 				directorio sources:
+			Se copia al directorio en el que se han descomprimido las fuentes:
+				cp 01-squidguard-1.2.0-dbcfg.patch squidGuard-1.20/.
+			Se aplica:
+				patch -p1 < 01-squidguard-1.2.0-dbcfg.patch
+			Configuramos antes de la compilacin:
+				./configure -prefix=/usr/squidGuard -with-db=/usr/Berkeley
+
+			--prefix establece el directorio en el que se instala squidGuard 					($SQUIDGUARD), si se escoge otro destino hay que reflejarlo en el archivo 
+			/etc/watcherCat/watcherconf.xml segn se especifica en el formato de este.
+			--with-db indica el directorio en el que se ha instalado la librera BerkeleyDB
+			
+			Compilamos e instalamos:
+				make
+				make install
+
+			Creamos directorio para logs de squidGuard
+				mkdir $SQUIDGUARD/squidGuard/log
+		
+			Creamos directorio para base de datos de blacklists:
+				mkdir /var/lib/squidguard
+				mkdir /var/lib/squidguard/db
+			Si por cualquier motivo la base de datos se ubica en otro lugar hay que 				especificarlo en archivo /etc/watcherCat/watcherconf.xml segn se especifica 			en el formato de ste.
+
+			INSTALACION DE SARG
+			
+			apt-get install sarg
+
+			El ejecutable se ubica en /usr/bin, el directorio donde almacena los registros 			de navegacin en /var/www/squid-reports 
+	
+
+	2- Descomprimir archivo de fuentes acept-0.9-AAAAMMDD.tar.bz2
+	
+		Si se descomprime desde el raiz del sistema el archivo  
+	acept-0.9-AAAAMMDD.tar.bz2, la estructura de directorios se volcara en los lugares 		adecuados. Si se descomprime desde otro lugar del sistema conviene hacerlo con la opcion:		
+	tar jxvf acept-0.9-AAAAMMDD.tar.bz2 -C /
+
+		
+3.Poniendo en marcha el sistema
+	
+	Para el funcionamiento de la aplicacin es necesario crear un usuario y grupo de administracin para squid, para lo que se necesitan privilegios de administrador:
+	
+	groupadd squid
+	useradd squid -g squid
+			
+	Una vez realizados todos los pasos detallados anteriormente lanzamos el script que inicializa la instalacin con la estructura de directorios y los permisos asociados, lo encontramos en:
+	
+	/opt/caton/watchercat/instalacion.py
+	
+	Se puede lanzar este ejecutable desde la linea de comandos con:
+	./instalacion.py
+	
+	Ya tenemos la instalacin de acept-0.9 finalizada, ahora se procede a la configuracin que quiere se aplique para cada usuario.
+
+ 	Esta versin dispone de un asistente de configuracin del acceso que se va a establecer para cada uno de los usuarios del sistema. Adems de este asistente la aplicacin dispone de un entorno de configuracin avanzado, an no se encuentra disponible en esta versin, pero lo estar muy pronto. Adems en este entorno se consulta y recoge toda la informacin de estadsticas de uso y registros de navegacin web.
+
+	Para configurar acept para cada usuario del sistema lanzaremos la aplicacin del mismo nombre, que se encuentra en /opt/caton/watchercat
+
+	./acept.py
+
+	Puesto que para lanzar esta aplicacin se necesitan privilegios de administrador, si el usuario que la lanza no es el administrador del sistema, se mostrar la siguiente ventana, pidiendo que el usuario se identifique como administrador:
+
+
+
+
+
+	
+				  Figura 1. Peticin de autentificacin para el usuario
+
+	Si la contrasea introducida no es la correcta, aparece un mensaje indicando que el password introducido no es el correcto. Si se autentifica correctamente el usuaio, se accede a la aplicacin de configuracin de ACEPT.
+	
+	Aparecer el panel de introduccin de la aplicacin, con tres grandes botones destacados.
+
+
+				Figura 2. Ventana principal de configuracin de Acept
+
+	 Con el primero de ellos, lanzamos el asistente de configuracin: sta es una herramienta de fcil uso que permite realizar configuraciones sencillas a travs de una serie de ventanas que nos guan en la configuracin del sistema. Podremos con ella configurar el acceso de cada uno de los usuarios que deseamos monitorizar en el sistema en unos pocos paso muy simples que a continuacin mostramos.
+
+	El segundo botn lanza la aplicacin de configuracin y consulta de nuestro sistema: an no disponible en esta versin.
+
+	El tercer botn cierra la aplicacin ACEPT.
+	
+
+	Al seleccionar el asistente de configuracin la primera ventana que se nos muestra es la siguiente:
+	
+				Figura 3. Ventana de seleccin del usuario a configurar
+
+	En esta ventana seleccionamos el usuario del sistema para el que vamos a establecer una serie de polticas de acceso al ordenador. En el men desplegable que aparece al pulsar sobre la pestaa que se encuentra a la derecha del cuadro de texto, se mostrarn  todos los usuarios del sistema a los cuales podemos monitorizar su acceso al ordenador. 
+	
+	Es importante sealar que si ya existe una configuracin previamente confeccionada para un usuario la sobre-escribiremos, perdiendo la configuracin anterior una vez que salvemos esta nueva.
+
+	Con el botn 'Siguiente' continuamos el proceso de configuracin.
+
+	
+
+		Figura 4. Ventana de configuracin del uso horario del ordenador
+
+	En esta tercera ventana del asistente, mostrada en la figura superior (fig. 4) se establece los horarios en los que se permite al usuario seleccionado que haga uso del ordenador, siendo bloqueado el acceso al usuario fuera de este horario.
+	El asistente permite establecer un horario de acceso para todos los das de la semana, de lunes a viernes, los fines de semana o especificar los das que el administrador indique.
+	
+	Ejemplos de configuraciones vlidas con el asistente seran:
+		Todos los das de la semana: de 16:30 a 18:30
+		De Lunes a Viernes de 10:00 a 13:30
+		Sbados y Domingos: de 12:00 a 14:30
+		Lunes, Mircoles y Viernes: de 18:00 a 20:00 
+
+	En el siguiente paso del Asistente se permite configurar que uso va a poder hacer el usuario de los servicios de internet (navegar por la web, messenger, ftp ...), limitando el tiempo que se les permite hacer uso de estos servicios cada da, en el conjunto de la semana y en el mes.
+
+	Lgicamente el lmite diario que se especifique debe ser menor que el semanal, y este a su vez menor que el mensual. 
+
+	Advertencia: Si se selecciona la opcin: 'S, deseo establecer un lmite de horas..', y los lmites se 	mantienen a '0', se estar bloqueando el uso de estos servicios por parte del usuario. Si no se desea 	establecer lmites, se ha de seleccionar la opcin 'No deseo establecer lmites...'
+	
+			Figura 5. Ventana de establecimiento de lmites de uso del ordenador
+
+	A continuacin el asistente nos permite configurar que tipo de contenidos deseamos filtrar para el usuario. Nos aparecen seis categoras globales que es posible  filtrar: contenidos violentos, sexuales-pornogrficos, sobre drogas, correo-web, juegos y hacking(piratera).
+
+	
+			   Figura 6. Ventana de configuracin del filtrado de acceso a internet
+	
+	Tras completar esta serie de pasos, hemos completado la configuracin del acceso que el usuario podr realizar en el sistema, al pulsar el botn Siguiente se nos muestra un resumen de la configuracin construida. Podemos repasar si estamos de acuerdo con ella, si no nos satisface esta configuracin pulsamos el botn Cancelar, y no se guarda nada de esta configuracin, volveremos a la ventana principal de la aplicacin acept (figura 1) y podremos iniciar de nuevo la configuracin. Si estamos de acuerdo con esta configuracin pulsamos el botn Aceptar y quedar reflejada en la configuracin del sistema con los cambios seleccionados.
+
+	En cualquier momento de la configuracin se puede cancelar pulsando la pestaa para cierre que aparece en la esquina superior derecha de todas las ventanas del asistente.
+
+
+
+
+
+
+
+
+		
+		Figura 7. Ventana resumen de configuracin seleccionada para el usuario
+
+	Haciendo uso del asistente, configuramos el acceso de los usuarios al sistema, que queramos controlar. Para que estas configuraciones tengan efecto, la aplicacin mefistofelina, debe de mantenerse lanzada en el sistema de manera ininterrumpida. Y en caso de que caiga levantarla de nueva.
+	La versin de este paquete an no contempla estas acciones por lo que deber ser el administrador el que deba configurar esto o mantener lanzada la aplicacin mefistofelina.
+
+
+
+	El programa que monitoriza el sistema,  se encuentra en /opt/caton/watchercat, cuyo archivo principal es:
+
+		./mefistofelina.py
+
+	Con esto tenemos el programa en marcha con la configuracin que hayamos establecido funcionando disponible para pruebas.
+
+
+
+4.Opciones de configuracin del sistema
+	
+	A continuacin se describen algunas de las posibilidades de administracin manual que tolera este paquete, que son implementadas en la herramienta de configuracin avanzada, de la que an no se dispone en esta versin.
+
+
+4.1.Recopilacin de registros de navegacin peridicos
+
+La aplicacin actual est configurada para que peridicamente se almacene un resumen de los registros de navegacin web de los usuarios que tienen monitorizado cualitativamente este servicio.
+La recopilacin de estos registros se realiza mediante la herramienta 'sarg'. Por defecto la instalacin se configura para recopilar estos registros cada siete das, pero esto puede ser modificado por el administrador del sistema.
+La configuracin de stas acciones, y la consulta de stos registros de navegacin web se realizarn a travs de la aplicacin grfica de Acept, la cual an no se encuentra disponible.
+
+
+Mientras se ultima el entorno, el administrador puede consultar estos registros directamente en la salida que sarg proporciona, por peticin de acept.
+Los registros se encuentran disponibles en la ubicacin:
+
+/var/www/squid-reports/NOMBRE_USUARIO/index.html
+
+Si se accede a esta pgina a travs del navegador del sistema, aparece una pgina en la que se recogen los distintos informes, que pueden ser consultados. La pagina que se muestra es similar a la siguiente. En este caso accedemos a los registros del usuario 'luis'.
+
+Figura 8. Presentacin grfica de los registros de navegacin de un usuario
+
+Si pinchamos sobre uno de estos informes, el que recoge por ejemplo el periodo 24jan2006-30jan2006 (24 a 30 de enero), se nos muestra la siguiente informacin:
+
+			Figura 9. Resumen registros navegacin del usuario en un periodo concreto
+		
+
+
+En la ventana que se muestra en la figura 9 nos aparecen dos pequeos enlaces:
+
+Topsites: Muestra las 100 pginas ms visitadas e informacin adicional como el nmero de visitas, el trfico que registraron(cantidad de bytes transferidos)...
+Sitios y Usuarios: Muestra un listado de todas las pginas visitadas por el usuario consultado, en ese intervalo, ordenadas  alfabticamente.
+
+
+4.3.Creacin de listas blancas locales para cada usuario
+La creacin de listas blancas para usuarios se hace editando manualmente el archivo 'domains' que para ello se destina, que se localiza en la base de datos de squidguard:
+/var/lib/squidguard/db/
+En el directorio de nombre white_$USER, donde $USER es el nombre del usuario
+En este archivo se introducen las direcciones o dominios a los que se quiere dar acceso al usuario, y stas no sern filtradas por squidGuard.
+
+
+4.4....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----
+Documento creado por: Maria D. Prez Gutirrez <mshk@caton.es>
+		fecha ultima modificacin: 26/01/2006

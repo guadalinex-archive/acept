@@ -1,0 +1,2 @@
+?package(acept):needs=X11 section=Apps/Net title="Control de acceso a Internet (acept)" command="acept.py" \
+icon="/usr/share/acept/pixmaps/gato.png"

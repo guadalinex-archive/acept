@@ -1,0 +1,19 @@
+# Automatically added by dh_installinit
+if [ -x "/etc/init.d/aceptd" ]; then
+	update-rc.d aceptd defaults >/dev/null
+	if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
+		invoke-rc.d aceptd start || exit $?
+	else
+		/etc/init.d/aceptd start || exit $?
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_python
+PYTHON=python2.4
+if which $PYTHON >/dev/null 2>&1 && [ -e /usr/lib/$PYTHON/compileall.py ]; then
+	DIRLIST=" /usr/share/acept /usr/lib/python2.4/site-packages"
+	for i in $DIRLIST ; do
+		$PYTHON /usr/lib/$PYTHON/compileall.py -q $i
+	done
+fi
+# End automatically added section

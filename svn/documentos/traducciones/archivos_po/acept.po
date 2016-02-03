@@ -1,0 +1,606 @@
+# Archivo de internacionalización de acept
+# Copyright (C) 2007, Sadesi
+# FIRST AUTHOR Néstor chacón Manzano <nchacon@caton.es>, 2007
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Acept 1.2.6-11\n"
+"POT-Creation-Date: 2007-09-06 16:37+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Néstor Chacón Manzano <nchacon@caton.es>\n"
+"Language-Team: Español <es@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+msgid "Cierra el programa"
+msgstr ""
+
+msgid "Desea salir de esta ventana?"
+msgstr "¿ Desea salir de esta ventana ?"
+
+msgid "Salir"
+msgstr ""
+
+msgid "Aplicacion"
+msgstr "Aplicación"
+
+msgid "Configura el uso temporal de los recursos"
+msgstr ""
+
+msgid "Horarios"
+msgstr ""
+
+msgid "Configura el filtro de contenidos"
+msgstr ""
+
+msgid "Contenidos"
+msgstr ""
+
+msgid "Usuarios"
+msgstr ""
+
+msgid "Define nuevos servicios"
+msgstr ""
+
+msgid "Servicios"
+msgstr ""
+
+msgid "Configura diversos aspectos del filtro de contenidos"
+msgstr ""
+
+msgid "Listas"
+msgstr ""
+
+msgid "Configurar"
+msgstr ""
+
+msgid "Uso web"
+msgstr ""
+
+msgid "Genera las estadisticas de uso"
+msgstr "Genera las estadísticas de uso"
+
+msgid "Aplicaciones"
+msgstr ""
+
+msgid "Estadisticas"
+msgstr "Estadísticas"
+
+msgid "Datos acerca del programa"
+msgstr ""
+
+msgid "Sobre ACEPT"
+msgstr ""
+
+msgid "Ayuda"
+msgstr ""
+
+msgid "Configuracion Avanzada"
+msgstr "Configuración Avanzada"
+
+msgid ""
+"ACEPT \n"
+" Asistente para el Control Electronico Paterno-MaTerno \n"
+" Junta de Andalucia - Caton Sistemas Alternativos\n"
+" 2006 - 2007"
+msgstr ""
+"ACEPT \n"
+" Asistente para el Control Electrónico Paterno.maTerno \n"
+" Junta de Andalucía - Catón Sistemas Paterno maTerno \n"
+" 2006 - 2007"
+
+msgid "Aceptar"
+msgstr ""
+
+msgid "Cancelar"
+msgstr ""
+
+msgid ""
+"Usuarios a partir de \n"
+"la siguiente UID:"
+msgstr ""
+
+msgid "Dias"
+msgstr "Días"
+
+msgid "Permitir ?"
+msgstr "¿ Permitir ?"
+
+msgid "Intervalo"
+msgstr ""
+
+msgid "Lunes"
+msgstr ""
+
+msgid "de "
+msgstr ""
+
+msgid " a "
+msgstr ""
+
+msgid "Martes"
+msgstr ""
+
+msgid "Miercoles"
+msgstr "Miércoles"
+
+msgid "Jueves"
+msgstr ""
+
+msgid "Viernes"
+msgstr ""
+
+msgid "Sabado"
+msgstr "Sábado"
+
+msgid "Domingo"
+msgstr ""
+
+msgid "Usuario sin limitaciones en los servicios?"
+msgstr "¿ Usuario sin limitaciones en los servicios ?"
+
+msgid "No"
+msgstr ""
+
+msgid "Si"
+msgstr "Sí"
+
+msgid "Limpiar"
+msgstr ""
+
+msgid "Servicio"
+msgstr ""
+
+msgid "Limite Diario"
+msgstr "Límite Diario"
+
+msgid "Limite Semanal"
+msgstr "Límite Semanal"
+
+msgid "Limite Mensual"
+msgstr "Límite Mensual"
+
+msgid "Servicio sin limites"
+msgstr "Servicio sin límites"
+
+msgid "Total Diario"
+msgstr ""
+
+msgid "Total Semanal"
+msgstr ""
+
+msgid "Total Mensual"
+msgstr ""
+
+msgid "Hora"
+msgstr ""
+
+msgid "Dia"
+msgstr "Día"
+
+msgid "Mes"
+msgstr ""
+
+msgid "Anno"
+msgstr "Año"
+
+msgid "Uso del pc"
+msgstr ""
+
+msgid "Consumido"
+msgstr ""
+
+msgid "Prorrogas"
+msgstr "Prórrogas"
+
+msgid ""
+"Usuario modificado\n"
+" Desea configurar alguno mas?"
+msgstr ""
+"Usuario modificado\n"
+"¿ Desea configurar alguno más ?"
+
+msgid "Aviso ACEPT"
+msgstr ""
+
+msgid "servicios"
+msgstr ""
+
+msgid "consumido"
+msgstr ""
+
+msgid "prorrogas"
+msgstr "prórrogas"
+
+msgid ", columna"
+msgstr ""
+
+msgid "La celda en la fila"
+msgstr ""
+
+msgid "contiene un valor incorrecto"
+msgstr ""
+
+msgid "de la seccion"
+msgstr "de la sección"
+
+msgid "Nuevo Servicio"
+msgstr ""
+
+msgid "Modificar servicio"
+msgstr ""
+
+msgid "Nombre"
+msgstr ""
+
+msgid "Puertos"
+msgstr ""
+
+msgid "Puertos Tcp"
+msgstr ""
+
+msgid "Insertar"
+msgstr ""
+
+msgid "Borrar"
+msgstr ""
+
+msgid "Rango ?"
+msgstr "¿ Rango ?"
+
+msgid "Puertos Udp"
+msgstr ""
+
+msgid "Eliminar servicio"
+msgstr ""
+
+msgid "Modificar Servicio"
+msgstr ""
+
+msgid "Esta seguro de que desea eleminar el servicio"
+msgstr "¿ Está seguro de que desea eliminar el servicio "
+
+msgid "?"
+msgstr "?"
+
+msgid "El nombre de servicio ya existe!"
+msgstr "¡ El nombre del servicio ya existe !"
+
+msgid "Desea configurar alguno mas ?"
+msgstr "¿ Desea configurar alguno más ?"
+
+msgid "Proceso finalizado correctamente"
+msgstr ""
+
+msgid "No hay puertos asignados al servicio!"
+msgstr "¡ No hay puertos asignados al servicio !"
+
+msgid "Desea intentarlo de nuevo?"
+msgstr "¿ Desea intentarlo de nuevo ?"
+
+msgid "El nombre del servicio esta en blanco!"
+msgstr "¡ El nombre del servicio está en blanco !"
+
+msgid "Listas negras locales"
+msgstr ""
+
+msgid "Fuentes de listas negras"
+msgstr ""
+
+msgid "Crear lista local"
+msgstr ""
+
+msgid "Modificar lista local"
+msgstr ""
+
+msgid "Eliminar lista local"
+msgstr ""
+
+msgid "Eliminar fuente"
+msgstr ""
+
+msgid "Actualizar cada"
+msgstr ""
+
+msgid "Actualizar ahora"
+msgstr ""
+
+msgid "Nueva fuente"
+msgstr ""
+
+msgid "No ha seleccionado ninguna lista negra local!"
+msgstr "¡ No ha seleccionado ninguna lista negra local !"
+
+msgid "Esta seguro de que desea eliminar la lista"
+msgstr "Está seguro de que desea eliminar la lista"
+
+msgid " Finalizado proceso de actualizacion "
+msgstr " Finalizado el proceso de actualización "
+
+msgid " Listado de fuentes actualizado. Desea salir? "
+msgstr " Listado de fuentes actualizado ¿ Desea salir ?"
+
+msgid "Listas negras del sistema"
+msgstr ""
+
+msgid "Lista negra del usuario"
+msgstr ""
+
+msgid "Insertar todo"
+msgstr ""
+
+msgid "Borrar todo"
+msgstr ""
+
+msgid "Introduzca un nuevo dominio"
+msgstr ""
+
+msgid "Lista blanca del usuario"
+msgstr ""
+
+msgid "Desea configurar alguno mas?"
+msgstr "¿ Desea configurar alguno más ?"
+
+msgid "modificado correctamente"
+msgstr ""
+
+msgid "No ha seleccionado ningun usuario!"
+msgstr "¡ No ha seleccionado ningún usuario !"
+
+msgid "URL"
+msgstr ""
+
+msgid "Eliminar todo"
+msgstr ""
+
+msgid "Lista de dominios"
+msgstr ""
+
+msgid "No hay urls en la lista de dominos"
+msgstr "No hay urls en la lista de dominios"
+
+msgid "La Lista no tiene nombre"
+msgstr ""
+
+msgid "Lista modificada correctamente"
+msgstr ""
+
+msgid "Los registros se almacenan automaticamente"
+msgstr ""
+
+msgid "Cada"
+msgstr ""
+
+msgid "Salvar"
+msgstr ""
+
+msgid "Configurar consulta"
+msgstr ""
+
+msgid "Consultar"
+msgstr ""
+
+msgid "Usuario"
+msgstr ""
+
+msgid "Periodo"
+msgstr ""
+
+msgid "Palabra clave"
+msgstr ""
+
+msgid "Resultados de la consulta"
+msgstr ""
+
+msgid "Guardar como"
+msgstr ""
+
+msgid "Cerrar"
+msgstr ""
+
+msgid "Registros de navegacion web"
+msgstr "Registros de navegación web"
+
+msgid "Numero de paginas visitadas por usuario"
+msgstr "Número de páginas visitadas por usuario"
+
+msgid "Trafico por usuario"
+msgstr "Tráfico por usuario"
+
+msgid "Paginas visitadas ordenadas por usuario"
+msgstr "Páginas visitadas ordenadas por usuario"
+
+msgid "Paginas visitadas ordenadas por url"
+msgstr "Páginas visitadas ordenadas por url"
+
+msgid "Paginas visitadas ordenadas cronologicamente"
+msgstr "Páginas visitadas ordenadas cronológicamente"
+
+msgid "Paginas visitadas por numero de visitas"
+msgstr "Páginas visitadas por número de visitas"
+
+msgid "Paginas visitadas ordenadas por trafico"
+msgstr "Páginas visitadas ordenadas por tráfico"
+
+msgid "Busqueda por palabras clave en las url"
+msgstr "Búsqueda de palabras clave en las url"
+
+msgid "Archivos de texto"
+msgstr ""
+
+msgid "Salvar el informe en..."
+msgstr ""
+
+msgid ""
+"El Archivo indicado ya existe\n"
+" Desea sobreescribirlo?"
+msgstr ""
+"El archivo indicado ya existe\n"
+"¿ Desea sobreescribirlo ?"
+
+msgid "Todos"
+msgstr ""
+
+msgid "Opciones de la consulta"
+msgstr ""
+
+msgid "Intervalo de tiempo"
+msgstr ""
+
+msgid "Registros del uso de aplicaciones"
+msgstr ""
+
+msgid "Aplicaciones utilizadas, ordenadas por tiempo de uso"
+msgstr ""
+
+msgid "Aplicaciones utilizadas, ordenadas por usuario"
+msgstr ""
+
+msgid "Mensual"
+msgstr ""
+
+msgid "Semanal"
+msgstr ""
+
+msgid "Que usuario desea configurar "
+msgstr "¿ Qué usuario desea configurar ?"
+
+msgid "Siguiente"
+msgstr ""
+
+msgid "Asistente 1/5"
+msgstr ""
+
+msgid "Cuando desea que el usuario pueda usar el equipo ?"
+msgstr "¿ Cuándo desea que el usuario pueda usar el equipo ?"
+
+msgid "Anterior"
+msgstr ""
+
+msgid "Asistente 2/5"
+msgstr ""
+
+msgid "Desea limitar el tiempo de uso de internet ?"
+msgstr "¿ Desea limitar el tiempo de uso de internet ?"
+
+msgid "Si, deseo establecer un limite de horas diario, semanal y mensual"
+msgstr "Sí, deseo establecer un límite de horas diario, semanal y mensual."
+
+msgid "No, me basta con las restricciones al uso del ordenador."
+msgstr ""
+
+msgid "Limite diario"
+msgstr "Límite diario"
+
+msgid "horas"
+msgstr ""
+
+msgid "minutos"
+msgstr ""
+
+msgid "Limite semanal"
+msgstr "Límite semanal"
+
+msgid "Limite mensual"
+msgstr "Límite mensual"
+
+msgid "Asistente 3/5"
+msgstr ""
+
+msgid "El tiempo que se contabiliza no es el tiempo que permanece abierto el navegador, si no el tiempo que dura la conexion al servidor web."
+msgstr "El tiempo que se contabiliza, no es el tiempo que permanece abierto el navegador, si no el tiempo que dura la conexión al servidor web"
+
+msgid "Seleccione los contenidos que desea denegar"
+msgstr ""
+
+msgid "Ninguno"
+msgstr ""
+
+msgid "Violentos"
+msgstr ""
+
+msgid "Sexuales"
+msgstr ""
+
+msgid "Drogas"
+msgstr ""
+
+msgid "Correo-web"
+msgstr ""
+
+msgid "Apuestas"
+msgstr ""
+
+msgid "Hacking"
+msgstr ""
+
+msgid "Asistente 4/5"
+msgstr ""
+
+msgid "Resumen"
+msgstr ""
+
+msgid " La configuracion construida no es valida"
+msgstr " La configuración construída no es válida."
+
+msgid "El usuario no tendria acceso al sistema."
+msgstr "El usuario no tendría acceso al sistema."
+
+msgid "Este dia el acceso quedaria inhabilitado."
+msgstr "Este día el acceso quedaría inhabilitado."
+
+msgid "Estos dias el acceso quedaria inhabilitado."
+msgstr "Estos días el acceso quedaría inhabilitado."
+
+msgid " El horario seleccionado para"
+msgstr ""
+
+msgid "no es valido"
+msgstr ""
+
+msgid "Asistente 5/5"
+msgstr ""
+
+msgid "Datos"
+msgstr ""
+
+msgid "Valores"
+msgstr ""
+
+msgid "Total diario"
+msgstr ""
+
+msgid "Total mensual"
+msgstr ""
+
+msgid "Total semanal"
+msgstr ""
+
+msgid "Contenidos Filtrados"
+msgstr ""
+
+msgid "Limites temporales al uso de internet"
+msgstr "Límites temporales al uso de internet"
+
+msgid "Uso del ordenador : "
+msgstr ""
+
+msgid "a"
+msgstr ""
+
+msgid "de"
+msgstr ""
+
+msgid "Se crea archivo de configuracion"
+msgstr "Se crea archivo de configuración."
+
+msgid "Error en escritura de configuracion de asistente"
+msgstr "Error en escritura de configuración"
+
+msgid "Se escriben cambios en archivo de configuracion"
+msgstr "Se escriben cambios en el archivo de configuración."
+
+msgid "Se aplica configuracion web de usuario en sistema"
+msgstr "Se aplica la configuración web del usuario en el sistema."

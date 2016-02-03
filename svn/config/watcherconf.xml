@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<config>
+	<squid>
+		<dir_sq>/usr/share/acept/squid/</dir_sq>
+        <conf_sq>/etc/acept/squid/</conf_sq>
+		<port>55000</port>
+		<dir_sqg>/var/log/acept/squidGuard</dir_sqg>
+		<sqguard>/usr/bin/squidGuard</sqguard>
+        <sqbin>/usr/sbin/squid</sqbin>
+		<dbhome>/var/lib/squidguard/db</dbhome>
+        <logdir>/var/log/acept/squid/var/logs/</logdir>
+		<tmpdir>/tmp/watch_blacklist</tmpdir>
+		<filelog>watch_blacklist.log</filelog>
+        <page_dfl>http://www.guadalinex.org</page_dfl>
+		<last_update>07/02/2006</last_update>
+		<fr_update>0</fr_update>
+		<sargbin>/usr/bin/sarg</sargbin>
+		<conf_sarg>/etc/acept/squid/sarg_acept.conf</conf_sarg>
+		<sargrg>/var/www/squid-reports</sargrg>
+		<last_date>08Aug2007</last_date>
+		<fr_recol>7</fr_recol>
+	</squid>
+	<demonio>
+		<fecha>08 31 08 2007</fecha>
+	</demonio>
+	<servicios>
+		<dns tcp="s-53" udp="s-53"/>
+		<web tcp="s-80;s-443" udp=""/>
+	        <ftp tcp="s-20:s-21" udp=""/>
+	        <correo tcp="s-25;s-110;s-143" udp=""/>
+	        <msn tcp="s-1863;s-6891:s-6900" udp=""/>
+	        <ssh tcp="s-22" udp=""/>
+	        <telnet tcp="s-23" udp=""/>
+	        <term_serv tcp="s-3389" udp="s-3389"/>
+	        <x11 tcp="s-177;s-7100;s-6000:s-6040" udp="s-177"/>
+	        <nntp tcp="s-119" udp=""/>
+	        <kerberos tcp="s-88" udp=""/>
+	        <smb tcp="s-445;s-137:s-139" udp=""/>
+	        <nfs tcp="s-111" udp="s-111"/>
+	        <vnc tcp="s-5800;s-5900:s-5910" udp=""/>
+	        <irc tcp="s-6667" udp=""/>
+	        <ldap tcp="s-339" udp=""/>
+	        <cups tcp="s-636" udp=""/>
+	        <lpd tcp="s-515" udp=""/>
+	        <hpijs tcp="s-9100" udp=""/>
+	        <mysql tcp="s-3306" udp=""/>
+	        <distcc tcp="s-3632" udp=""/>
+	        <icq tcp="s-20000:s-20019" udp="s-4000"/>
+	        <news tcp="s-119" udp="s-119"/>
+	        <netmeting tcp="s-389;s-522;s-1503;s-1720;s-1731" udp=""/>
+	        <e2k tcp="s-4662" udp="s-4672"/>
+	</servicios>
+	<usuarios>
+	</usuarios>
+    <blacklists>
+        <source tag="nueva_fuente">
+        	<url>http://squidguard.mesd.k12.or.us/blacklists.tgz</url>
+        </source>
+    </blacklists>
+</config>

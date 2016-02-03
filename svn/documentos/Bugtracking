@@ -1,0 +1,83 @@
+#
+# Fichero:	 Bugtracking
+# Copyright: 	Junta de Andalucía <devmaster@guadalinex.org>
+# Autor: 	Maria Dolores Perez Gutierrez y Nestor Chacon Manzano
+# Fecha: 	mar 21 mar, 13:30:04 CET 2006
+# Licencia: 	GPL v.2
+# Proyecto impulsado y financiado por SADESI (Sociedad Andaluza para el Desarrollo de la Sociedad de la informaciÃ³n)
+#
+
+19/09/2006:
+	- Modificacion etiqueta nombre blacklists se incluia en archivo .versiones con el que 
+	se controla la actualizacion para no tener conflictos con blacklists procedentes de distintas
+	direcciones web.
+	- Revision y establecimiento en todos los puntos necesarios los permisos en directorios
+	de sistema de filtrado
+	- Subsanado bug en funcion guardaba configuracion de usuario desde configurador avanzado,
+	en caso de no contar con servicio web definido con limite horario pero contaba con filtrado
+	aparecia error por referenciar variable no definida.
+	- Modifica script de arranque dilantando espera en caso de invocar restart, espera anterior
+	generaba no se arrancara la aplicacion, esto solo se invocaba desde linea de comandos.	
+
+1-5/09/2006:
+	- Subsanado fallo no se bloqueban servicios una vez expirado tiempo uso, 
+	fallo se incluyo al modificar iptables para permitir descargar ftp. Se han refinado
+	de modo bloquea servicios al finalizar su uso y permite descargas ftp si servicio
+	ftp permitido.
+	- Listas negras locales definidas aplicadas a algun usuario no tenian efecto por
+	no establecerse para su grupo los permisos pertinentes. 
+	- Detectado fallos al definir servicios cuyo nombre coincidia con usuarios monitorizados
+	por la aplicacion o con nombres de apartados destacados del archivo de configuracion. Conflicto
+	con nombres de usuarios se ha resuelto accediendo por el path completo de los campos a los
+	respectivos nodos (servicio o usuario), de modo no se produce error. Conflicto con nombres
+	de apartados se ha mitigado incluyendo listado de palabras reservadas que no pueden ser empleadas
+	como nombres de servicios.
+	- Al eliminar usuario del sistema que estaba siendo monitorizado por la aplicacion se
+	producia error en la carga de la iptables, se previene comprobando antes de construir iptables
+	si los usuarios que aparecen en el archivo siguen existiendo en el sistema, si no es asi se elimina
+	su entrada.	
+-/08/2006:
+	- Subsanado bug en contabilizacion tiempo uso de servicios.
+	- Error al intentar incluir nuevas fuentes de  listas negras debido a coincidencia de nombre 
+	de variable eliminado cambiando variable local de funcion ublacklists.
+	- Corregido error en extraccion de informes sobre uso de aplicaciones incluyendo comprabacion
+	no intenta extraer informe si no cuenta con todos los datos.
+
+31/05/2006:
+	- Se deja de usar atributo 'SetMinSize', no aceptado por version de wx de guadalinex 2004.
+
+30/05/2006:
+	- Se soluciona error no mostraba informacion ampliada en bienvenida a usuario (mas_info.py)
+	- Se resuelve fallo en definicion de prorrogas en uso de servicios (avanzado.py)
+
+19/04/2006:
+	- Eliminado bug mostraba error ocasionalmente en funciones saca_usuarios (watcherMods.py) 
+	y users_conect(func.py) al ejecutar orden 'commands.getouput('who -q')'
+	Solucionado integrando codigo dentro de bucle que en caso de excepcion la captura e intenta de
+	nuevo ejecutar la orden.
+	
+04/03/2006:
+	- Resuelto bug en funcion saca_usuarios (watcherMods.py), intentaba eliminar de lista
+	de usuarios notificados, usuarios no insertados sin comprobacion previa, en el momento de lanzar 
+	el demonio de acept y detectar usuario con conexion abierta no autorizado.
+
+21/03/2006:
+	- Resuelto bug no se reconfiguraban instancias de squid de usuarios
+	tras ser modificada su configuracion a traves del menu Usuarios->Horarios. 
+
+30/01/2006:
+	- Resuelto problema existia si instancia de squid quedaba en sistema
+	ejecutandose cuando mefistofelina no se detenia correctamente, mediante 
+	la creacion de la funcion squid_residual(watcherSquid)
+
+26/01/2006:
+	- Resuelto bug, error aparecia al lanzar aplicacion grafica de 
+	configuracion de acept sobre Guadalinex 2004 
+
+24/01/2006:
+	- Resuelto bug detectado, se continuaban incrementando contadores 
+	de servicio para un usuario cuando se encontraba inactivo
+	- Aplicacion solo detectaba cambio de fecha cuando se pasaba a dia 
+	mayor, ahora detecta cambios de fecha de dia, semana, mes y anno,
+	limpiando los registros correspondientes
+	

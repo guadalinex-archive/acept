@@ -1,0 +1,12 @@
+include MANIFEST.in
+include INSTALL
+include modelo.html
+include auth.py
+include barra.py
+include informe.py
+include mas_info.py
+include mensaje.py
+recursive-include pixmaps *
+recursive-include documentos *
+recursive-include config *
+recursive-include lang *

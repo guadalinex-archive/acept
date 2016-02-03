@@ -1,0 +1,384 @@
+#!/usr/bin/python
+# -*- coding: ISO-8859-1 -*-
+#
+# Fichero:	mefistofelina.py
+# Copyright:	Junta de Andaluc� <devmaster@guadalinex.org>
+# Autor:	Maria Dolores Perez Gutierrez y Nestor Chacon Manzano
+# Fecha:	lun mar 27 17:01:31 CET 2006
+# Licencia:	GPL v.2
+#
+# mefistofelina.py es el demonio de la aplicacion ACEPT, se encarga de monitorizar en el sistema 
+# las sesiones de los distintos usuarios controlados por esta aplicacion, aplicando las 
+# restricciones que para cada uno de ellos se han definido.
+
+from watcherMods import *
+from watcherSquid import *
+import os, os.path, signal, time
+from func import integridad_config
+
+escribe_log('Mefistofelina inicia su ejecucion',archivo.mefilog)
+
+# interfaz
+pid=os.getpid()
+fpid=open("/var/run/mefistofelina.pid","w")
+fpid.write(str(pid)+"\n")
+fpid.close()
+del fpid
+signal.signal(signal.SIGTERM,handler)
+signal.signal(signal.SIGCONT,handler)
+os.kill(pid,18)
+del pid
+
+#listas
+notif_sesion=[] # usuarios notificadas se finaliza su sesion
+notif_servicio=[] # notificar a usuarios cerca fin uso servicios
+#comprueba antes de entrar en bucle de control horario si es necesario lanzar las aplicaciones
+#actualiza blacklists
+#recoleccion de registros de navegacion y limpiado de archivos
+file_conf=archivo.configuracion
+
+examina_permisos(file_conf)
+
+if guardar_reg_nav(file_conf): 
+    genera_registros_periodicos(file_conf)
+if actualiza_blacklists(file_conf):
+    ublacklists(file_conf)
+
+#Comprueba si ha de detener alguna instancia residual de squid
+squid_residual(file_conf)
+    
+#Comprueba si ha de sacar a algun usuario del sistema
+saca_usuarios(file_conf, notif_sesion)
+
+#Variables
+intervalo=10 # segundos
+bucle=True
+
+# Comprueba que el archivo de configuracion no esta vacio
+integridad_config()
+
+#listado de instacias de squid enviadas a detenerse
+squid_stopped=[]
+
+# Bucle de control horario:
+configura_fw()
+while bucle:
+    guarda_hora=fecha()
+    hora=guarda_hora[0:2]+":"+guarda_hora[3:5]+":"+guarda_hora[6:8]
+    tmp_tcp_lst=conexiones()[:3]
+    tmp_udp_lst=conexiones()[3:]
+    tmp_tcp_dic={}    
+    # Si la variable global relee.configuracion es True relee el archivo de configuracion
+    if relee.configuracion:
+        relee.configuracion=False
+        hoy=fecha().split()[3:8]
+        del hoy[1]
+        anterior= ultima_fecha()
+        
+	# Comprueba que no haya pasado un dia / semana / mes
+        if int(hoy[3]) > int(anterior[3]) or int(hoy[2]) > int(anterior[2]):#cambio de anno o mes
+            recopila_aplic_mensual(file_conf)
+            restaura_todo()
+            if guardar_reg_nav(file_conf): 
+                genera_registros_periodicos(file_conf)
+            if actualiza_blacklists(file_conf):
+                ublacklists(file_conf)
+	    configura_fw()
+        elif int(hoy[1]) > int(anterior[1]):#cambio semana
+            recopila_aplic_semanal(file_conf)
+            restaura_semana()
+            if guardar_reg_nav(file_conf): 
+                genera_registros_periodicos(file_conf)
+            if actualiza_blacklists(file_conf):
+                ublacklists(file_conf)
+	    configura_fw()
+        elif int(hoy[0]) > int(anterior[0]):#cambio dia
+            restaura_dia()
+            if guardar_reg_nav(file_conf): 
+                genera_registros_periodicos(file_conf)
+            if actualiza_blacklists(file_conf):
+                ublacklists(file_conf)    
+	    configura_fw()
+        
+        shoy=""
+        for i in hoy:
+            shoy=shoy+i+" "
+        shoy=shoy[:-1]
+        actualiza_fecha(shoy)
+        del hoy
+        guarda_hora=fecha()
+        hora=guarda_hora[0:2]+":"+guarda_hora[3:5]+":"+guarda_hora[6:8]
+        total_dic={}
+        udp_dic={}
+        # lee las definiciones de servicios y usuarios
+	def_servicios=servicios()
+        def_usuarios=usuarios()
+        hora2=hora
+        # Consulta las conexiones abiertas
+	tmp_tcp_lst=conexiones()[:3]
+        tmp_udp_lst=conexiones()[3:]
+        tmp_tcp_dic={}
+        
+        # Configura los horarios en los que los usuarios tienen acceso al ordenador
+	salida=modifica_pam_d()
+        if salida:
+            configura_time_conf()
+            
+        manterior=int(anterior[2])    
+        anterior=int(anterior[0])
+        
+	# Aplica las reglas iptables
+        limites=restricciones(def_usuarios)
+        
+    #comprueba si hay que sacar a usuarios
+    notif_sesion=saca_usuarios(file_conf, notif_sesion)
+   
+    #Configura Squid
+    squid_stopped=apply_conf_squid(file_conf, squid_stopped)
+    
+    # Bandera para que si le llega al demonio una se�l -15 termine ordenadamente
+    if finaliza.ya:
+        actualizar.config=True
+        bucle=False
+        
+    
+    # Recorre las conexiones tcp abiertas y las asigna a sus respectivos usuarios
+    cantidad=len(tmp_tcp_lst[0])
+    for i in range(cantidad):
+        id=str(uid2nick(tmp_tcp_lst[2][i]))+"+"+str(puerto2name(tmp_tcp_lst[0][i],"tcp"))
+        td="00:00:00"
+        ts="00:00:00"
+        tm="00:00:00"
+        for z in def_usuarios:
+            datos=z.get(id,False)
+            if datos:
+                if len(datos) > 4:
+                    td=datos[3]
+                    ts=datos[4]
+                    tm=datos[5]
+                #se continua iterando--
+        tmp_tcp_dic[id]=[tmp_tcp_lst[1][i],hora,td,ts,tm]
+    del tmp_tcp_lst
+    
+    # Recorre las conexiones udp abiertas y las asigna a sus respectivos usuarios
+    cantidad=len(tmp_udp_lst[0])
+    tmp_udp_dic={}
+    
+    for i in range(cantidad):
+        id=str(uid2nick(tmp_udp_lst[2][i]))+"+"+str(puerto2name(tmp_udp_lst[0][i],"udp"))
+        td="00:00:00"
+        ts="00:00:00"
+        tm="00:00:00"
+        for z in def_usuarios:
+            datos=z.get(id,False)
+            if datos:
+                if len(datos) > 4:
+                    td=datos[3]
+                    ts=datos[4]
+                    tm=datos[5]
+        tmp_udp_dic[id]=[tmp_udp_lst[1][i],hora,td,ts,tm]
+    del tmp_udp_lst
+    
+    # Recorre las conexiones tcp 
+    for i in tmp_tcp_dic:
+        a=total_dic.get(i,False)
+        # Si nueva, guarda hora, usuario, servicios
+        usuario=i.split("+")[0]
+        servicio=i.split("+")[1] 
+        pro=prorroga(usuario,servicio)
+        if not a:
+            total_dic[i]=tmp_tcp_dic[i]
+        # Si vieja suma hora
+        # comprobar prorroga
+        elif not pro and servicio_monitorizado(usuario,servicio,archivo.mefilog):
+            lim=limites.get(i)
+	    if lim:
+		if lim[0]<total_dic[i][2] or lim[1]<total_dic[i][3] or lim[2]<total_dic[i][4]:
+		    consumido="00:00:00"
+		else:
+		    consumido=calcula_tiempo(total_dic[i][1],hora)
+            else:
+		consumido="00:00:00"
+	    
+	    total_dic[i][1]=hora
+            total_dic[i][2]=suma_horas(total_dic[i][2],consumido)
+            total_dic[i][3]=suma_horas(total_dic[i][3],consumido)
+            total_dic[i][4]=suma_horas(total_dic[i][4],consumido)
+    # udp
+    for i in tmp_udp_dic:
+        u=udp_dic.get(i,False)
+        # Si nueva, guarda hora, usuario, servicios
+        usuario=i.split("+")[0]
+        servicio=i.split("+")[1]
+        pro=prorroga(usuario,servicio)
+        if not u:
+            udp_dic[i]=tmp_udp_dic[i]
+        elif not pro and servicio_monitorizado(usuario,servicio,archivo.mefilog):
+            ya_en_tcp=tmp_tcp_dic.get(i,False)
+            if not ya_en_tcp:
+		lim=limites.get(i)
+		if lim:
+		    if lim[0]<udp_dic[i][2] or lim[1]<udp_dic[i][3] or lim[1]<udp_dic[i][4]:
+			consumido="00:00:00"
+		    else:
+			consumido=calcula_tiempo(udp_dic[i][1],hora)
+		else:
+		    consumido="00:00:00"
+                udp_dic[i][1]=hora
+                udp_dic[i][2]=suma_horas(udp_dic[i][2],consumido)
+                udp_dic[i][3]=suma_horas(udp_dic[i][3],consumido)
+                udp_dic[i][4]=suma_horas(udp_dic[i][4],consumido)
+		total_dic[i]=udp_dic[i]
+     
+  # Si la conexion ya no existe, actualiza el consumo y borra la entrada   
+    consumos=[]
+    
+    for i in range(4):
+        consumos.append([])
+    
+    borrar=[]
+    
+    for i in total_dic:
+        t=tmp_tcp_dic.get(i,False)
+        u=tmp_udp_dic.get(i,False)
+        if not t and not u or actualizar.config:
+	    actualizar.config=True
+            nom=i.split("+")[0]
+            srv=i.split("+")[1]
+            tmp_lim=limites.get(str(nom)+"+"+str(srv))
+            td=total_dic[i][2]
+            ts=total_dic[i][3]
+            tm=total_dic[i][4]
+            if tmp_lim :
+            	consumos[0].append(nom)
+                consumos[1].append(srv)
+                consumos[2].append(["total_diario","total_semanal","total_mensual"])
+                consumos[3].append([td,ts,tm])
+	    borrar.append(i)
+    if actualizar.config:
+        actualiza_consumo(consumos)
+        def_usuarios=usuarios()
+        for r in borrar:
+            del total_dic[r]
+            if udp_dic.get(r,False):
+                del udp_dic[r]
+        del borrar
+        actualizar.config=False
+ 
+    
+    # Controla los limites de cada cual y actua en caso necesario
+    for i in limites:
+	en_curso=total_dic.get(i,False)
+        if en_curso:
+	    if len(limites[i]) == 4:
+	        dh=(int(limites[i][0][:-6])-int(en_curso[2][:-6]))*60
+	        dm=(int(limites[i][0][-5:-3])-int(en_curso[2][-5:-3]))+dh
+	        sh=(int(limites[i][1][:-6])-int(en_curso[3][:-6]))*60
+	        sm=(int(limites[i][1][-5:-3])-int(en_curso[3][-5:-3]))+sh
+	        mh=(int(limites[i][2][:-6])-int(en_curso[4][:-6]))*60
+	        mm=(int(limites[i][2][-5:-3])-int(en_curso[4][-5:-3]))+mh
+
+	        fm=0
+	        if dm <= sm and dm <= mm:
+	            fm=dm
+	        elif sm <= mm:
+	            fm=sm
+	        else:
+	            fm=mm
+	    else:
+		fm=0
+	     
+            for n in range(3):
+                n2=n+2
+		if len(limites[i]) == 4:
+                    h=int(limites[i][n][:-6])-int(en_curso[n2][:-6])
+                    m=int(limites[i][n][-5:-3])-int(en_curso[n2][-5:-3])
+                    s=int(limites[i][n][-2:])-int(en_curso[n2][-2:])
+		    bol=int(limites[i][-1])
+                else :
+                    bol=0
+                    
+                if bol==1:
+                    if h < 0:
+                        actualiza_consumo([[str(i.split("+")[0])], [str(i.split("+")[1])], [['activo']], [[0]]])
+                        def_usuarios=usuarios()
+                        limites=restricciones(def_usuarios)
+                        configura_fw()
+			elem=[str(i.split("+")[0]),str(i.split("+")[1])]
+			try:
+				notif_servicio.remove(elem)
+			except ValueError:
+				pass
+			mens=" 'Tiempo excedido usando el servicio "+i.split("+")[1]+"'"
+			os.system('/usr/share/acept/mensaje.py '+i.split("+")[0]+mens+' 2>/dev/null')
+                    elif h == 0:
+                        if m <0:
+                            actualiza_consumo([[str(i.split("+")[0])], [str(i.split("+")[1])], [['activo']], [[0]]])
+                            def_usuarios=usuarios()
+                            limites=restricciones(def_usuarios)
+                            configura_fw()
+			    elem=[str(i.split("+")[0]),str(i.split("+")[1])]
+			    try:
+			            notif_servicio.remove(elem)
+			    except ValueError:
+				    pass
+			    mens=" 'Tiempo excedido usando el servicio "+i.split("+")[1]+"'"
+			    os.system('/usr/share/acept/mensaje.py '+i.split("+")[0]+mens+' 2>/dev/null')
+                            
+                        elif m <= tiempo.aviso and m>0:
+			    elem=[str(i.split("+")[0]),str(i.split("+")[1])]
+			    try:
+			            ind=notif_servicio.index(elem)
+			    except ValueError:
+			            notif_servicio.append(elem)
+			    	    mens=" 'Le quedan "+str(fm)+" minutos de servicio "+i.split("+")[1]+"'"
+			    	    os.system('/usr/share/acept/mensaje.py '+i.split("+")[0]+mens+' 2>/dev/null')
+                        elif m == 0:
+                            if s < 0:
+                                actualiza_consumo([[str(i.split("+")[0])], [str(i.split("+")[1])], [['activo']], [[0]]])
+                                def_usuarios=usuarios()
+                                limites=restricciones(def_usuarios)
+                                configura_fw()
+			        elem=[str(i.split("+")[0]),str(i.split("+")[1])]
+			        try:
+			                notif_servicio.remove(elem)
+			        except ValueError:
+				        pass
+			    	mens=" 'Tiempo excedido usando el servicio "+i.split("+")[1]+"'"
+				os.system('/usr/share/acept/mensaje.py '+i.split("+")[0]+mens+' 2>/dev/null')
+   		    elif h == 1:
+			mi=int(en_curso[n2][-5:-3])-int(limites[i][n][-5:-3])
+			if (mi+tiempo.aviso) >= 60:
+			    elem=[str(i.split("+")[0]),str(i.split("+")[1])]
+			    try:
+			            ind=notif_servicio.index(elem)
+			    except ValueError:
+			            notif_servicio.append(elem)
+			    	    mens=" 'Le quedan "+fm+" minutos de servicio "+i.split("+")[1]+"'"
+			    	    os.system('/usr/share/acept/mensaje.py '+i.split("+")[0]+mens+' 2>/dev/null')
+				 
+    # Limita el consumo de cpu
+    time.sleep(intervalo)
+
+    # Graba periodicamente los consumos, tiempo.intervalo define cada cuanto
+
+    # Comprueba que las reglas de iptables son las correctas
+    configura_fw()
+
+    if int(calcula_tiempo(hora2,hora)[6:8]) >= tiempo.intervalo:
+        hora2=hora
+        actualizar.config=True
+        hoy=int(fecha()[9:11])
+        mhoy=int(fecha()[-7:-5])
+        if mhoy-manterior>0:
+            relee.configuracion=True
+        elif hoy-anterior>0:
+            relee.configuracion=True
+
+
+
+# Antes de cerrarse el programa, limpia las iptables
+os.system("iptables -F -t nat")
+os.system("iptables-restore < /etc/acept/watcherCat/limpia_iptables")
+
+escribe_log('Mefistofelina finaliza su ejecucion',archivo.mefilog)

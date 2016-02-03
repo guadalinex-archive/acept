@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.9.125  (Linux)">
+	<META NAME="CREATED" CONTENT="20060210;13174800">
+	<META NAME="CHANGED" CONTENT="20060213;11464900">
+</HEAD>
+<BODY LANG="es-ES" DIR="LTR">
+<P ALIGN=CENTER><FONT SIZE=6 STYLE="font-size: 22pt"><B>Uso del
+asistente para configurar un usuario</B></FONT></P>
+<P ALIGN=LEFT STYLE="font-weight: medium"><FONT SIZE=2>Para acceder
+al asistente, una vez lanzada la aplicaci&oacute;n y autenticado como
+root en caso necesario pulse en el bot&oacute;n 'Asistente'.</FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/Inicio.jpg" NAME="gr&aacute;ficos1" ALIGN=LEFT WIDTH=336 HEIGHT=150 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT><FONT SIZE=2>Desde ah&iacute; acceder&aacute; a una
+ventana con una lista despegable en la que tendr&aacute; que
+seleccionar el nombre del usuario que desea configurar. N&oacute;tese
+que para usuarios que tengan un uid menor a 1000 tendr&aacute; que
+usar el <A HREF="av_usr_000.html#hor" NAME="av_usr_000.html#hor">interfaz
+avanzado</A></FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/as_1.jpg" NAME="gr&aacute;ficos2" ALIGN=LEFT WIDTH=286,8 HEIGHT=136 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT STYLE="font-weight: medium"><FONT SIZE=2>La siguiente
+ventana permite configurar el horario de uso del ordenador.</FONT></P>
+<P ALIGN=LEFT STYLE="font-weight: medium"><FONT SIZE=2>Consta de dos
+partes diferenciadas, los d&iacute;as de la semana en los que podr&aacute;
+utilizar el ordenador y por otro lado el rango de horas. Para
+facilitar la selecci&oacute;n de los d&iacute;as se dispone adem&aacute;s
+de una serie de botones para automatizar las opciones m&aacute;s
+frecuentes, 'Toda la semana', 'De lunes a viernes' y 'Los fines de
+semana'. S&iacute; desea cualquier otra combinaci&oacute;n seleccione
+'Especificar' y a continuaci&oacute;n marque los d&iacute;as.</FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/as_2.jpg" NAME="gr&aacute;ficos3" ALIGN=LEFT WIDTH=400 HEIGHT=250 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT STYLE="font-weight: medium"><FONT SIZE=2>Tras pulsar
+siguiente, le aparecer&aacute; la opci&oacute;n de regular el uso de
+internet de manera independiente al del ordenador o no. Por defecto
+se asume que se desean utilizar las mismas restricciones que para el
+uso del equipo, en caso de que desee limitar de una manera diferente
+el uso de internet deber&aacute; seleccionar 'Si, deseo establecer un
+l&iacute;mite de horas, diario, semanal y mensual' en la pesta&ntilde;a
+superior de selecci&oacute;n.</FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/as_3.jpg" NAME="gr&aacute;ficos4" ALIGN=LEFT WIDTH=400 HEIGHT=221 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT><FONT SIZE=2>En dicho caso podr&aacute; seleccionar el
+n&uacute;mero de horas m&aacute;ximo en el que se podr&aacute;n usar
+todos los servicios a diario, semanalmente y mensualmente. Debemos
+a&ntilde;adir, que si se desea configurar los distintos servicios por
+separado hay que recurrir al <A HREF="av_usr_000.html#srv" NAME="av_usr_000.html#srv">interfaz
+avanzado.</A></FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/as_3-b.jpg" NAME="gr&aacute;ficos7" ALIGN=LEFT WIDTH=400 HEIGHT=221 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT><FONT SIZE=2>En la pr&oacute;xima secci&oacute;n podr&aacute;
+limitar el tipo de contenidos accesibles v&iacute;a web, para ello
+seleccione las casillas de los contenidos que considere inadecuados y
+a partir de una lista de la Junta de Andaluc&iacute;a se censurar&aacute;n
+las p&aacute;ginas que coincidan con esa categor&iacute;a. Para un
+mayor control d ellas listas, as&iacute; como para a&ntilde;adir
+listas blancas rem&iacute;tase al <A HREF="av_usr_000.html#cont" NAME="av_usr_000#cont">interfaz
+avanzado.</A></FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/as_4.jpg" NAME="gr&aacute;ficos5" ALIGN=LEFT WIDTH=384 HEIGHT=205 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT STYLE="font-weight: medium"><FONT SIZE=2>Una vez
+realizados todos los pasos aparecer&aacute; un resumen, si est&aacute;
+de acuerdo con todo presione en el bot&oacute;n 'Aceptar' para
+aplicar los cambios, en caso contrario pulse en 'Cancelar'.</FONT></P>
+<P ALIGN=CENTER><IMG SRC="imagenes/as_5.jpg" NAME="gr&aacute;ficos6" ALIGN=LEFT WIDTH=450 HEIGHT=220 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+</BODY>
+</HTML>

@@ -1,0 +1,227 @@
+
+1.¿ Qué es ACEPT ?
+2.¿ De qué consta el proyecto ?
+3.¿ Cuáles son sus requisitos ?
+4.¿ Cómo lo instalo ?
+5.¿ Qué partes están ya terminadas ?
+6.¿ Cuándo estará listo ? 
+7.¿ Qué es lo que falta ?
+8.¿ Cuál es el formato de los archivos de configuración del demonio ?
+9.¿ Por qué esos nombres ?
+10.¿ Está disponible en otros idiomas ?
+11. ¿ A qué tipo de licencia se acoge ?
+
+
+1.¿ Qué es ACEPT ?
+
+	ACEPT es un proyecto patrocinado por la Junta de Andalucía, asignado a Catón, que pretende dotar de una herramienta de control parental de fácil uso para su distribución Guadalinex.
+	Con ella se podrán estableces filtros de contenido para la web, cuotas de uso para las aplicaciones de red, tales como el navegador, chat, etc. y del propio pc para los distintos usuarios de la máquina. 
+
+2.¿ De que consta el proyecto ?
+
+	El proyecto cuenta con tres capas diferenciadas, la primera consta de una serie de herramientas ya existentes tales como squid, iptables, pam, nuwf, python y wxpython, la segunda de un demonio que monitoriza el funcionamiento de la máquina, controlando los horarios y la tercera de una igu (interfaz gráfica de usuario) que aglutina la configuración de todo lo anterior de manera simple. Aparte también existe otro nivel de abstracción perteneciente al instalador.
+
+3.¿ Cuáles son sus requisitos ?
+
+	En principio los propios de Guadalinex, si bien es fácilmente adaptable a cualquier otra distribución de Gnu/Linux.
+	Además hacen falta una serie de paquetes:
+
+iptables
+pam
+python
+squid 3.0
+nufw
+wxpython
+
+	De estos los tres primeros vienen de serie en Guadalinex.
+
+4. ¿ Cómo lo instalo ?
+
+	Por ahora la única manera de probarlo es instalar los paquetes que faltan manualmente, el código que corresponde al demonio y configurarlo manualmente, tanto el script de arranque como los archivos de configuración.
+
+	En un futuro próximo se creará un  archivo de instalación deb que configurará todo adecuadamente y un tar.gz que instalará únicamente el demonio y la igu.
+
+5.¿ Qué partes están ya terminadas ?
+
+	El demonio está terminado en un 90% y la igu en apenas un 10%. Ya es posible llevar el control horario y establecer los filtros de manera separada.
+
+6.¿ Cuándo estará listo ?
+
+	La fecha de entrega del proyecto es el 9 de diciembre del 2005
+
+7.¿ Qué es lo que falta ?
+
+	Las tareas pendientes incluyen la integración del control horario y los filtros en un único demonio, algunas funciones menores del demonio como los avisos gráficos , esto al 99% , y la monitorización del tiempo permitido de sesión frente al pc. También falta la combinación del modo transparente del proxy con la distinción de usuarios, esto al 80% , la igu, el módulo estadístico  y el instalador.
+
+8.¿ Cuál es el formato de los archivos de configuración del demonio ?
+
+	El directorio de configuración es /etc/watcherCat dentro tenemos el archivo general watcherconf.xml y lang/es/messages.txt para la configuración del idioma. Este último está pendiente de la evaluación del método estándar con archivos .pot  como alternativa.
+
+	Watchercat.xml
+
+<?xml version="1.0" ?>
+<config>
+	<demonio>
+		<fecha>11 45 11 2005</fecha>
+	</demonio>
+	<servicios>
+		<msn tcp="s-1863;s-6891:s-6900" udp=""/>
+		<correo tcp="s-25;s-110;s-143" udp=""/>
+		<dns tcp="s-53" udp="s-53"/>
+		<web tcp="s-80;s-443" udp=""/>
+		<ftp tcp="s-20:s-21" udp=""/>
+		<ssh tcp="s-22" udp=""/>
+	</servicios>
+	<usuarios>
+		
+		<xalabin acceso="al0000-2400">
+			<correo>
+				<activo>1</activo>
+			</correo>
+			<ssh>
+				<activo>1</activo>
+			</ssh>
+	
+		<dns>
+				<activo>1</activo>
+			</dns>
+			<web>
+				<limite_diario>00:10:00</limite_diario>
+				<limite_semanal>00:35:00</limite_semanal>
+				<limite_mensual>20:30:00</limite_mensual>
+				<total_diario>00:05:42</total_diario>
+				<total_semanal>00:15:42</total_semanal>
+				<total_mensual>00:37:30</total_mensual>
+				<prorroga>19:00:00 09/11/2005</prorroga>
+				<activo>1</activo>
+			</web>
+			<msn>
+				<limite_diario>02:00:00</limite_diario>
+				<limite_semanal>10:00:00</limite_semanal>
+				<limite_mensual>45:30:00</limite_mensual>
+				<total_diario>00:00:00</total_diario>
+				<total_semanal>00:00:00</total_semanal>
+				<total_mensual>00:00:06</total_mensual>
+				<prorroga>19:00:00 02/11/2005</prorroga>
+				<activo>1</activo>
+			</msn>
+			<ftp>
+				<limite_diario>10:00:00</limite_diario>
+				<limite_semanal>30:45:00</limite_semanal>
+				<limite_mensual>50:01:43</limite_mensual>
+				<total_diario>00:00:00</total_diario>
+				<total_semanal>00:00:00</total_semanal>
+				<total_mensual>00:00:00</total_mensual>
+				<prorroga>18:10:00 02/10/2005</prorroga>
+				<activo>1</activo>
+			</ftp>
+		</xalabin>
+		
+		<juan acceso="al0900-2200">
+			<ftp>
+				<limite_diario>01:00:00</limite_diario>
+				<limite_semanal>03:00:00</limite_semanal>
+				<limite_mensual>06:00:00</limite_mensual>
+				<total_diario>00:00:00</total_diario>
+				<total_semanal>00:00:00</total_semanal>
+				<total_mensual>00:00:00</total_mensual>
+				<prorroga>00:00:00 00/00/0000</prorroga>
+				<activo>1</activo>
+			</ftp>
+			<ssh>
+				<limite_diario>00:05:00</limite_diario>
+				<limite_semanal>60:00:00</limite_semanal>
+				<limite_mensual>200:00:00</limite_mensual>
+				<total_diario>00:00:00</total_diario>
+				<total_semanal>00:00:00</total_semanal>
+				<total_mensual>00:00:00</total_mensual>
+				<prorroga>00:00:00 00/00/0000</prorroga>
+				<activo>1</activo>
+			</ssh>
+		</juan>
+		
+	
+		<mshk acceso="!mo1000-1200">
+			<todo>
+				<activo>1</activo>
+			</todo>
+		</mshk>
+
+	</usuarios>
+
+</config>
+
+	Toda la configuración se incluye entre <config> y </config>
+En la sección <demonio> encontramos <fecha> que debe de tener una fecha en ese formato, una vez arrancado el demonio por primera vez, se encarga el de gestionarlo. Además en breve se incluirá una sección <lang> para especificar el idioma.
+
+	La sección <servicios> especifica los servicios que vamos a monitorizar. Debemos de tener en cuenta de que lo que no exista aquí será denegado por defecto.
+El formato es el siguiente:
+
+<servicio tcp="" udp=""/>
+
+	"servicio" es el nombre que le asignaremos, por ejemplo "web"
+tcp son los puertos tcp de los que constará, se componen de s-número y se pueden separar por ; para distintos puertos o por : para una correlación. Por ejemplo:
+
+	tcp="s-80" Abre tan sólo el puerto 80, tcp="s-80;s-443" Abre los puertos 80 y 443, tcp="s-80;s-1:s10" Abre los puertos 80 y del 1 al 10.
+El campo udp corresponde al protocolo udp y se complementa exactamente igual.
+
+	El campo <usuarios> establece los límites que tiene cada usuario dentro de un tag con su nombre. Dentro de este tag, por ejemplo para el usuario "pepe" <pepe> podemos añadir varios valores:
+
+	Para permitirle el acceso a todos los servicios declarados sin restricciones
+
+<todo>
+	<activo>1</activo>
+</todo>
+
+
+	Para permitir el acceso sin restricciones a un servicio dado
+
+<nombre_de_servicio>
+	<activo>1</activo>
+</nombre_de_servicio>
+
+	Para controlar un servicio, en <limite_*> introducimos la cantidad de horas que tiene permitido ese usuario para ese servicio a nivel diario, semanal y mensual
+
+<nombre_de_servicio>
+	<limite_diario>00:05:00</limite_diario>
+	<limite_semanal>60:00:00</limite_semanal>
+	<limite_mensual>200:00:00</limite_mensual>
+	<total_diario>00:00:00</total_diario>
+	<total_semanal>00:00:00</total_semanal>
+	<total_mensual>00:00:00</total_mensual>
+	<prorroga>00:00:00 00/00/0000</prorroga>
+	<activo>1</activo>
+<nombre_de_servicio>
+
+	Los totales hay que dejarlos a 00:00:00 la primera vez que se introduzca y luego es la aplicación la que se encarga de gestionarlo.
+
+	<prorroga> Especifica si ese usuario tiene un permiso especial durante el cual no se le computa el tiempo utilizado, debe de ponerse a 00:00:00 00/00/0000 inicialmente. A posteriori, en caso de desear utilizar este campo,  es preciso poner la hora y la fecha hasta la cual tendrá carta blanca en ese mismo formato.
+
+	<activo> especifica que es usuario tiene permiso para usar ese servicio, se usa a nivel interno y hay que dejarlo a 1 al crear el archivo.
+
+	Para que un usuario no tenga acceso a un servicio, basta con no crear la entrada en su sección o ponerle <activo> a 0
+
+9.¿ Por qué esos nombres ?
+
+	ACEPT: Asistente para el Control Electrónico Paterno
+
+	Caton: Es el nombre de la empresa, en referencia al libro escolar y por extensión a los Catones romanos. Es además un juego de palabras con un cierto significado similar a "gato grande" que referencia una de nuestras áreas principales de trabajo como es el clustering.
+
+	WatcherCat: Es el nombre del proyecto que integra al demonio y el igu.
+Todos los proyectos de Caton tienen algo que ver con el término gato, generalmente en inglés.
+Esta vez se le ha añadido la palabra vigilante, watcher, como prefijo poco después de leer Watchmen de Alan Moore.
+	
+	Mefistofelina: El nombre del demonio que controla todo es la suma de Mefisto y felino, aunque al final ha terminado en diablesa más que en demonio debido a un cambio de género.
+
+
+10. ¿ Está disponible en otros idiomas ?
+
+	El igu, y los diversos mensajes del demonio están habilitados para usar distintos idiomas, por ahora mediante un método propio, aunque probablemente pasemos al uso de .pot
+
+11. ¿ A qué licencia se acoge ?
+
+	Tenemos el privilegio de poder desarrollar bajo licencia GNU.
+
+
+
+

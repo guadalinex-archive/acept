@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Exec=/usr/share/acept/lanza_informe.sh
+Icon=/usr/share/acept/pixmaps/gato.png
+Terminal=false
+Name=Informe para Control de acceso a Internet (acepti)
+Comment=Informe de uso Acept
+Type=Application
+MultipleArgs=false
+Categories=Network
+NotShowIn=KDE
